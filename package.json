@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "daisyui": "^1.16.2",
+    "localforage": "^1.10.0",
     "lodash": "^4.17.21",
+    "p-queue": "^7.1.0",
     "vue": "^3.2.16"
   },
   "devDependencies": {

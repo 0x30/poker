@@ -63,7 +63,7 @@ export const useMountComponentAndAnimed = (params: {
 
   const app = createApp(
     <Modal
-      style={{ zIndex: 20 }}
+      style={{ zIndex: 9999 }}
       close={(method) => (closeMethod = method)}
       destory={() => {
         app.unmount();

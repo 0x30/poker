@@ -1,6 +1,15 @@
 import { defineComponent } from "@vue/runtime-core";
+import { usePlayers } from "../../core/Player";
+import { createPlayerAlert } from "../UserList";
 
 export default defineComponent(() => {
+  const { addPlayer } = usePlayers();
+
+  const clickAddPlayer = async () => {
+    const player = await createPlayerAlert();
+    addPlayer(player);
+  };
+
   return () => {
     return (
       <div class="fixed bottom-20 right-5">
@@ -12,7 +21,7 @@ export default defineComponent(() => {
               </a>
             </li>
             <li>
-              <a>
+              <a onClick={clickAddPlayer}>
                 <i class="gg-user-add"></i>
               </a>
             </li>

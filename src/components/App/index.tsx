@@ -7,9 +7,9 @@ import FixedMenu from "./FixedMenu";
 export default defineComponent(() => {
   return () => {
     return (
-      <div class="h-full w-full absolute content-between flex flex-col">
+      <div class="h-full w-full absolute flex flex-col">
         <Header></Header>
-        <Container class="flex-1"></Container>
+        <Container></Container>
         <Footer></Footer>
         <FixedMenu></FixedMenu>
       </div>
