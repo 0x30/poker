@@ -1,13 +1,25 @@
 import { defineComponent } from "@vue/runtime-core";
+
 import { usePlayers } from "../../core/Player";
-import { createPlayerAlert } from "../UserList";
+import { useGameAlert } from "../modal/Game";
+
+import { useGames } from "../../core/Game";
+import { usePlayerAlert } from "../modal/Player";
 
 export default defineComponent(() => {
   const { addPlayer } = usePlayers();
+  const { addGame } = useGames();
 
   const clickAddPlayer = async () => {
-    const player = await createPlayerAlert();
+    const player = await usePlayerAlert();
     addPlayer(player);
+  };
+
+  const clickAddGame = async () => {
+    const games = await useGameAlert();
+    for await (const game of games) {
+      addGame(game);
+    }
   };
 
   return () => {
@@ -26,7 +38,7 @@ export default defineComponent(() => {
               </a>
             </li>
             <li>
-              <a>
+              <a onClick={clickAddGame}>
                 <i class="gg-games"></i>
               </a>
             </li>

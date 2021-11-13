@@ -30,8 +30,6 @@ export class Player {
   }
 }
 
-export const createPlayer = () => {};
-
 const db = localforage.createInstance({
   name: "plyers",
   storeName: "players",
@@ -92,4 +90,12 @@ export const usePlayers = () => {
     addJoinCount,
     addVictoryCount,
   };
+};
+
+export const playerName = (player: Player) => {
+  return player.nikeName ?? "无名之辈";
+};
+
+export const playerNameCode = (player: Player) => {
+  return playerName(player).slice(0, 1);
 };
