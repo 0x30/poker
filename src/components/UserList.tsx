@@ -1,5 +1,6 @@
 import { defineComponent, PropType } from "vue";
-import { Player, usePlayers } from "../core/Player";
+import { usePlayers } from "../core/Player";
+import { Player } from "../core/model";
 
 const UserCard = defineComponent({
   props: {
@@ -64,8 +65,7 @@ const UserList = defineComponent({
 
     return () => {
       return (
-        <div class="grid grid-rows-1 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-3">
-          <button onClick={add}>增加</button>
+        <div class="grid grid-rows-1 grid-cols-1 lg:grid-cols-2 xl:grid-cols-6 gap-3">
           {players.value.map((p) => (
             <UserCard player={p} />
           ))}

@@ -1,34 +1,7 @@
-import { computed, ref } from "vue";
-import localforage, { key } from "localforage";
+import { ref } from "vue";
+import localforage from "localforage";
 import Queue from "p-queue";
-import { generateId } from "./util";
-
-export class Player {
-  // 唯一标识
-  id: string;
-
-  // 昵称
-  nikeName?: string;
-  // 主机地址
-  host: string;
-
-  // 加入次数
-  joinCount: number;
-  // 胜利次数
-  victoryCount: number;
-
-  // 创建时间
-  createTime: number;
-
-  constructor(host: string, nikeName?: string) {
-    this.id = generateId();
-    this.nikeName = nikeName;
-    this.joinCount = 0;
-    this.victoryCount = 0;
-    this.host = host;
-    this.createTime = new Date().getTime();
-  }
-}
+import { Player } from "./model";
 
 const db = localforage.createInstance({
   name: "plyers",

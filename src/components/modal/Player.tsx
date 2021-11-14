@@ -1,5 +1,5 @@
 import { defineComponent, PropType, ref } from "vue";
-import { Player } from "../../core/Player";
+import { Player } from "../../core/model";
 import { useMountComponentAndAnimed } from "../../core/useMountComponentAndAnimed";
 
 const User = defineComponent({

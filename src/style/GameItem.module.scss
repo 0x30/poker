@@ -1,0 +1,36 @@
+.it {
+  position: absolute;
+}
+
+.item {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 9999px;
+  margin: 2.5rem;
+  margin-bottom: 3.5rem;
+  position: relative;
+
+  & > div:nth-child(1) {
+    position: absolute;
+    top: -10%;
+    left: -50%;
+  }
+  & > div:nth-child(2) {
+    position: absolute;
+    top: -10%;
+    right: -55%;
+  }
+  & > div:nth-child(3) {
+    position: absolute;
+    bottom: -55%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.desk {
+  position: absolute;
+  top: -20%;
+  left: 0;
+  transform: scale(1.3);
+}

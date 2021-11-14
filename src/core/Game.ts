@@ -1,43 +1,10 @@
 import localforage from "localforage";
-import { computed, ref } from "vue";
-import { Card, getRunFastCards } from "./Card";
-import { Player } from "./Player";
+import { computed, reactive, ref, toRaw, toRef, toRefs, unref } from "vue";
+import { getRunFastCards, isHeaderThree } from "./Card";
+import { Card, Player, Game, GamePlayer } from "./model";
 import Queue from "p-queue";
 import { generateId } from "./util";
-
-class Round {
-  index: number;
-  starter: Player;
-}
-
-export class Game {
-  id: string;
-  players: GamePlayer[];
-  /// 回合数
-  // rounds: Round[] = [];
-
-  constructor(players: GamePlayer[]) {
-    this.id = generateId();
-    this.players = players;
-  }
-}
-
-export interface GamePlayer extends Player {
-  cards: Card[];
-}
-
-export const useGame = (players: Player[]) => {
-  const cards = getRunFastCards();
-  const p = players.map<GamePlayer>((v, i) => ({
-    ...v,
-    ...{ cards: cards[i] },
-  }));
-  const game = new Game(p);
-
-  const start = () => {};
-
-  return {};
-};
+import { detectType } from "./Referee";
 
 const db = localforage.createInstance({
   name: "games",
@@ -46,6 +13,9 @@ const db = localforage.createInstance({
 
 const games = ref<Game[]>([]);
 const queues: { [key: string]: Queue } = {};
+
+
+detectType([])
 
 export const useGames = () => {
   const refreshGames = async () => {
@@ -58,8 +28,6 @@ export const useGames = () => {
   };
 
   const addGame = async (game: Game) => {
-    console.log("新增游戏", game);
-
     await db.setItem(game.id, game);
     refreshGames();
   };
@@ -76,9 +44,7 @@ export const useGames = () => {
   };
 
   const updateGame = (game: Game) => {
-    exec(game, async () => {
-      await db.setItem(game.id, game);
-    });
+    exec(game, async () => await db.setItem(game.id, game));
   };
 
   refreshGames();
@@ -88,5 +54,53 @@ export const useGames = () => {
     addGame,
     delGame,
     updateGame,
+  };
+};
+
+export const useGame = (g: Game) => {
+  const game = reactive(g);
+  const { updateGame } = useGames();
+
+  const start = () => {
+    if (game.isFinished) return;
+    changeCurrentPlayer(currentPlayer());
+  };
+
+  const currentPlayer = () => {
+    const currentPlayer = getCurrentPlayer();
+    if (currentPlayer) return currentPlayer;
+    return getHeart3Player()!;
+  };
+
+  const getCurrentPlayer = () => game.players[getCurrentPlayerIndex()];
+  const getCurrentPlayerIndex = () => game.players.findIndex((p) => p.current);
+  const getHeart3Player = () =>
+    game.players.find(
+      (p) => p.cards.find((c) => isHeaderThree(c)) !== undefined
+    );
+
+  const changeCurrentPlayer = (player: GamePlayer) => {
+    game.players.forEach((p) => {
+      if (p.id === player.id) p.current = true;
+      else p.current = false;
+    });
+
+    updateGame(toRaw(game));
+  };
+
+  const getNextPlayer = () => {
+    const index = game.players.findIndex((p) => p.id === currentPlayer().id);
+    return game.players[(index + 2) % 3];
+  };
+
+  const changeNextUser = () => {
+    changeCurrentPlayer(getNextPlayer());
+  };
+
+  start();
+
+  return {
+    game,
+    changeNextUser,
   };
 };

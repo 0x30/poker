@@ -1,12 +1,7 @@
 import { computed, defineComponent, PropType } from "@vue/runtime-core";
 import { ref } from "vue";
-import {
-  Player,
-  playerName,
-  playerNameCode,
-  usePlayers,
-} from "../../core/Player";
-import { Game, GamePlayer } from "../../core/Game";
+import { playerName, playerNameCode, usePlayers } from "../../core/Player";
+import { Game, GamePlayer, Player } from "../../core/model";
 import { getRunFastCards } from "../../core/Card";
 import { useMountComponentAndAnimed } from "../../core/useMountComponentAndAnimed";
 import { getPermutations } from "../../core/util";
@@ -95,10 +90,7 @@ const SelectPlayer = defineComponent({
       const result = permutationPlayers.flatMap((players) => {
         const res = new Array(repeatCountValue.value).fill("").map(() => {
           const cards = getRunFastCards();
-          return players.map<GamePlayer>((v, i) => ({
-            ...v,
-            ...{ cards: cards[i] },
-          }));
+          return players.map<GamePlayer>((v, i) => new GamePlayer(v, cards[i]));
         });
         return res;
       });
