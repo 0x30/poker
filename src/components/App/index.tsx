@@ -2,7 +2,6 @@ import { defineComponent } from "@vue/runtime-core";
 import Header from "./Header";
 import Footer from "./Footer";
 import Container from "./Container";
-import FixedMenu from "./FixedMenu";
 
 export default defineComponent(() => {
   return () => {
@@ -11,7 +10,6 @@ export default defineComponent(() => {
         <Header></Header>
         <Container></Container>
         <Footer></Footer>
-        <FixedMenu></FixedMenu>
       </div>
     );
   };
