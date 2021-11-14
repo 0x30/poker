@@ -1,6 +1,6 @@
 import { Card } from "./model";
 
-enum CardsType {
+export enum CardsType {
   /// 任意1张牌
   dan = 1,
   /// 数值相同的2张牌
@@ -113,7 +113,7 @@ const isShun = (numbers: number[], target: 2 | 3) => {
 /**
  * 分辨牌型
  */
-const detectTypeNumbers = (numbers: number[]): Result | undefined => {
+export const detectTypeNumbers = (numbers: number[]): Result | undefined => {
   if (numbers.length === 0) return undefined;
   if (numbers.length === 1) return { type: CardsType.dan, weight: numbers[0] };
 
@@ -124,7 +124,7 @@ const detectTypeNumbers = (numbers: number[]): Result | undefined => {
   if (numbers.length === 3 && same(numbers)) {
     // 三条A单出不带牌时是最大的炸弹，带牌时则作为普通牌型。
     if (numbers[0] === 14) {
-      return { type: CardsType.zhadan, weight: Number.MAX_VALUE };
+      return { type: CardsType.zhadan, weight: numbers[0] };
     }
     return { type: CardsType.santiao, weight: numbers[0] };
   }
@@ -177,7 +177,7 @@ export const detectType = (cards: Card[]): Result | undefined => {
  * @param curr 当前牌组
  * @param currIsLast 是否为当前出牌人的最后一手
  */
-const duelNumbers = (
+export const duelNumbers = (
   prev: number[],
   curr: number[],
   currIsLast: boolean
@@ -207,6 +207,7 @@ const duelNumbers = (
     ) {
       return currRes.weight > prevRes.weight;
     }
+    if (prev.length !== curr.length) return undefined;
   }
 
   if (currRes.type === prevRes.type) {
@@ -214,88 +215,4 @@ const duelNumbers = (
   }
 
   return undefined;
-};
-
-(window as any).TestDetect = () => {
-  const assets = (
-    res: Result | undefined,
-    type: CardsType | undefined,
-    weight: number | undefined
-  ) => {
-    if (res?.type === type && res?.weight === weight) console.log("✅ ");
-    else console.log("❌");
-  };
-
-  assets(detectTypeNumbers([3]), CardsType.dan, 3);
-  assets(detectTypeNumbers([3, 3]), CardsType.dui, 3);
-  assets(detectTypeNumbers([3, 3, 3, 3]), CardsType.zhadan, 3);
-  assets(detectTypeNumbers([3, 3, 3]), CardsType.santiao, 3);
-  assets(detectTypeNumbers([3, 3, 3, 4]), CardsType.sandaiyi, 3);
-  assets(detectTypeNumbers([3, 3, 3, 4, 4]), CardsType.sandaier, 3);
-  assets(detectTypeNumbers([3, 4, 5, 6, 7]), CardsType.danshun, 7);
-  assets(detectTypeNumbers([3, 3, 4, 4]), CardsType.shuangshun, 4);
-  assets(detectTypeNumbers([3, 3, 3, 4, 4, 4]), CardsType.sanshun, 4);
-  assets(detectTypeNumbers([3, 3, 3, 3, 4, 4]), CardsType.sidaier, 3);
-  assets(
-    detectTypeNumbers([3, 3, 3, 4, 4, 4, 5, 6, 7, 8]),
-    CardsType.feijichibang,
-    4
-  );
-
-  assets(
-    detectTypeNumbers([3, 3, 3, 5, 5, 5, 5, 6, 7, 8]),
-    undefined,
-    undefined
-  );
-
-  assets(
-    detectTypeNumbers([3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15]),
-    CardsType.danshun,
-    15
-  );
-
-  assets(detectTypeNumbers([9, 10, 11, 12, 13, 14]), CardsType.danshun, 14);
-
-  assets(detectTypeNumbers([3, 4]), undefined, undefined);
-  assets(detectTypeNumbers([3, 4, 4]), undefined, undefined);
-  assets(detectTypeNumbers([3, 4, 5]), undefined, undefined);
-  assets(detectTypeNumbers([3, 4, 5, 6, 8]), undefined, undefined);
-};
-
-(window as any).TestDuel = () => {
-  const assets = (res: boolean | undefined, tar_res: boolean | undefined) => {
-    if (res === tar_res) console.log("✅ ");
-    else console.log("❌");
-  };
-
-  assets(duelNumbers([3], [4], true), true);
-  assets(duelNumbers([3], [4], false), true);
-  assets(duelNumbers([3], [4, 4], false), undefined);
-  assets(duelNumbers([3, 3], [4, 4], false), true);
-  assets(duelNumbers([3, 3, 3], [4, 4, 4], false), true);
-  assets(duelNumbers([3, 3, 3], [4, 4, 4, 3], true), true);
-  assets(duelNumbers([3, 3, 3, 3, 4], [4, 4, 4, 4], true), undefined);
-  assets(duelNumbers([3, 3, 3, 3, 4, 4], [4, 4, 4, 4], true), true);
-  assets(duelNumbers([3, 3, 3, 3], [14, 14, 14], true), true);
-  assets(duelNumbers([3, 3, 4, 4], [3, 3, 4, 4], true), false);
-  assets(duelNumbers([3, 3, 4, 4], [4, 4, 5, 5], true), true);
-  assets(duelNumbers([3, 3, 3, 4, 4, 4], [4, 4, 4, 5, 5, 5], true), true);
-  assets(
-    duelNumbers(
-      [3, 3, 3, 4, 4, 4, 6, 6, 7, 7],
-      [4, 4, 4, 5, 5, 5, 10, 11, 12, 13],
-      true
-    ),
-    true
-  );
-  assets(
-    duelNumbers([3, 3, 3, 3, 7, 7], [4, 4, 4, 5, 5, 5, 10, 11, 12, 13], true),
-    undefined
-  );
-  assets(duelNumbers([4, 5, 6, 7, 8, 9], [9, 10, 11, 12, 13], true), undefined);
-  assets(duelNumbers([4, 5, 6, 7, 8, 9], [9, 10, 11, 12, 13, 14], true), true);
-  assets(
-    duelNumbers([4, 5, 6, 7, 8, 9, 10], [4, 5, 6, 7, 8, 9, 10], true),
-    false
-  );
 };
