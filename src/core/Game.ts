@@ -1,10 +1,10 @@
 import localforage from "localforage";
-import { computed, reactive, ref, toRaw, toRef, toRefs, unref } from "vue";
-import { getRunFastCards, isHeaderThree } from "./Card";
-import { Card, Player, Game, GamePlayer } from "./model";
+import { reactive, ref, toRaw } from "vue";
+import { isHeaderThree } from "./Card";
+import { Player, Game, GamePlayer } from "./model";
 import Queue from "p-queue";
-import { generateId } from "./util";
-import { detectType } from "./Referee";
+
+import { tips } from "./Tips";
 
 const db = localforage.createInstance({
   name: "games",
@@ -14,8 +14,7 @@ const db = localforage.createInstance({
 const games = ref<Game[]>([]);
 const queues: { [key: string]: Queue } = {};
 
-
-detectType([])
+tips([], []);
 
 export const useGames = () => {
   const refreshGames = async () => {

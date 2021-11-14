@@ -167,10 +167,6 @@ export const detectTypeNumbers = (numbers: number[]): Result | undefined => {
   return undefined;
 };
 
-export const detectType = (cards: Card[]): Result | undefined => {
-  return detectTypeNumbers(cards.map((c) => c.number));
-};
-
 /**
  * 对决
  * @param prev 上一组排
@@ -215,4 +211,20 @@ export const duelNumbers = (
   }
 
   return undefined;
+};
+
+export const detect = (cards: Card[]): Result | undefined => {
+  return detectTypeNumbers(cards.map((c) => c.number));
+};
+
+export const duel = (
+  prev: Card[],
+  curr: Card[],
+  currIsLast: boolean
+): boolean | undefined => {
+  return duelNumbers(
+    prev.map((c) => c.number),
+    curr.map((c) => c.number),
+    currIsLast
+  );
 };
