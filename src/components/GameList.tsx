@@ -50,9 +50,11 @@ const GameMenu = defineComponent({
     isFinish: Boolean,
     onToggle: Function as PropType<() => void>,
     onGoDetail: Function as PropType<() => void>,
-    onNext: Function as PropType<() => void>,
+    onNext: Function as PropType<() => Promise<void>>,
   },
   setup: (props) => {
+    const onNextIsLoading = ref(false);
+
     return () => {
       return (
         <div class="btn-group">
@@ -79,8 +81,14 @@ const GameMenu = defineComponent({
           {props.isFinish || props.isPlaying ? null : (
             <>
               <button
-                class="btn btn-outline btn-sm px-5"
-                onClick={props.onNext}
+                class={`btn btn-outline btn-sm px-5 ${
+                  onNextIsLoading.value ? "loading" : ""
+                }`}
+                onClick={async () => {
+                  onNextIsLoading.value = true;
+                  await props.onNext?.();
+                  onNextIsLoading.value = false;
+                }}
               >
                 <i class="gg-play-track-next transform "></i>
               </button>
@@ -124,13 +132,15 @@ const GameStat = defineComponent({
             <>
               <div class="stat place-items-center place-content-center">
                 <div class="stat-title text-xs font-semibold">状态</div>
-                <div class="stat-value text-base">
+                <div class="stat-value text-base text-success">
                   {props.isPlaying ? "自动" : "手动"}
                 </div>
               </div>
               <div class="stat place-items-center place-content-center">
                 <div class="stat-title text-xs font-semibold">当前回合</div>
-                <div class="stat-value text-base">{props.tricks}</div>
+                <div class="stat-value text-base text-success">
+                  {props.tricks}
+                </div>
               </div>
               <div class="stat place-items-center place-content-center">
                 <div class="stat-title text-xs font-semibold">剩余卡牌</div>
@@ -154,8 +164,6 @@ const GameItem = defineComponent({
     },
   },
   setup: (props) => {
-    const statusRef = ref("#2094f3");
-
     const { gameRef, moveCursor, isPlaying, toggle } = useGame(
       unref(props.game)
     );
@@ -179,12 +187,12 @@ const GameItem = defineComponent({
     });
 
     return () => {
+      const isFinish = gameRef.value.championer !== undefined;
       const leftCardNum = splayers.value.reduce(
         (t, s) => s.leftCards.length + t,
         0
       );
-
-      const isFinish = gameRef.value.championer !== undefined;
+      const deskColor = isFinish ? "#2094f3" : "#009485";
 
       return (
         <div class="card bg-base-100 shadow-lg px-4 py-4 grid items-center justify-items-center">
@@ -205,7 +213,7 @@ const GameItem = defineComponent({
               height="86"
             >
               <path
-                fill={statusRef.value}
+                fill={deskColor}
                 stroke="none"
                 d="M34.339745962156 9.6987298107781a10 10 0 0 1 17.320508075689 0l32.679491924311 56.602540378444a10 10 0 0 1 -8.6602540378444 15l-65.358983848622 0a10 10 0 0 1 -8.6602540378444 -15"
               ></path>
