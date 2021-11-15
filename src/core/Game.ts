@@ -40,9 +40,8 @@ export const useGame = (g: Game) => {
     const t = check(game, trick);
     if (needHandleTrick === undefined) {
       game.tricks.push({ idx: game.tricks.length, tricks: [t] });
-    } else {
-      lastTricks(game)?.push(trick);
-    }
+    } else lastTricks(game)?.push(trick);
+
     if (isGameFinish(game, trick.player)) game.championer = trick.player;
     gameRef.value = game;
     triggerRef(gameRef);

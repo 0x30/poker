@@ -6,6 +6,8 @@ import { Card, currentPlayer, Game, GamePlayer, Player } from "../core/model";
 import Class from "../style/GameItem.module.scss";
 import { getCurrentCardsPool } from "../core/Referee";
 
+import { Desk } from "../components/modal/Desk";
+
 const AvatarComp = defineComponent({
   props: {
     isFinish: Boolean,
@@ -240,6 +242,10 @@ export default defineComponent(() => {
         {games.value.map((g) => (
           <GameItem game={g} key={g.id} />
         ))}
+
+        {games.value.length > 0 ? (
+          <Desk game={games.value.slice(-1)[0]} />
+        ) : null}
       </div>
     );
   };

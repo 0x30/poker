@@ -121,28 +121,15 @@ export const getNeedHandleTrick = (game: Game) => {
 };
 
 export const currentPlayer = (game: Game) => {
-  console.log(game.players.map((res) => res.nikeName).join(","));
-
   // 当前没有回合.默认获取 黑桃三 的拥有者作为当前用户
   if (game.tricks.length === 0) {
-    const res = game.players.find((p) => hasDiamond3(p.cards))!;
-    console.log("当前第一回车，找到黑桃三", res.nikeName);
-    return res;
+    return game.players.find((p) => hasDiamond3(p.cards))!;
   }
-
   if (getNeedHandleTrick(game) === undefined) {
     const pid = lastTricks(game)?.slice(2, 3)[0].player.id;
-    const res = game.players.find((p) => p.id === pid)!;
-    console.log("当前两个人都跳过", res.nikeName);
-
-    return res;
+    return game.players.find((p) => p.id === pid)!;
   }
-
   const lastPlayer = lastTricks(game)?.[0].player;
   const li = game.players.findIndex((p) => p.id === lastPlayer?.id);
-  const res = game.players[(li + 2) % 3];
-
-  console.log("当前正常");
-
-  return res;
+  return game.players[(li + 2) % 3];
 };

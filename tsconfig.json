@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2019",
     "useDefineForClassFields": true,
-    "module": "CommonJS",
+    "module": "es2020",
     "moduleResolution": "node",
     "strict": true,
     "jsx": "preserve",
