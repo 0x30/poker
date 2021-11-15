@@ -1,4 +1,3 @@
-import { isReactive, toRaw } from "vue";
 import { generateId } from "./util";
 
 /**
@@ -92,44 +91,3 @@ export class GamePlayer extends Player {
     this.cards = cards;
   }
 }
-
-/**
- * 是否是三
- * @param card 卡片
- * @returns 是否
- */
-const hasDiamond3 = (cards: Card[]) =>
-  cards.findIndex((c) => c.color === Color.Diamond && c.number === 3) !== -1;
-
-export const lastTricks = (game: Game): Trick[] | undefined => {
-  return game.tricks
-    .slice(-1)
-    .sort((a, b) => b.idx - a.idx)[0]
-    .tricks.sort((a, b) => b.createTime - a.createTime);
-};
-
-export const getNeedHandleTrick = (game: Game) => {
-  if (game.tricks.length === 0) return undefined;
-  const lts = lastTricks(game);
-
-  if ((lts?.length ?? 0) > 2) {
-    if (lts?.slice(0, 2)?.every((t) => t.cards === undefined) === true) {
-      return undefined;
-    }
-  }
-  return lts?.find((t) => t.cards !== undefined);
-};
-
-export const currentPlayer = (game: Game) => {
-  // 当前没有回合.默认获取 黑桃三 的拥有者作为当前用户
-  if (game.tricks.length === 0) {
-    return game.players.find((p) => hasDiamond3(p.cards))!;
-  }
-  if (getNeedHandleTrick(game) === undefined) {
-    const pid = lastTricks(game)?.slice(2, 3)[0].player.id;
-    return game.players.find((p) => p.id === pid)!;
-  }
-  const lastPlayer = lastTricks(game)?.[0].player;
-  const li = game.players.findIndex((p) => p.id === lastPlayer?.id);
-  return game.players[(li + 2) % 3];
-};

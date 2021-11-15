@@ -1,6 +1,7 @@
 import { debugCards } from "./Card";
-import { Card, Color, currentPlayer, Game, getNeedHandleTrick } from "./model";
-import { duel, duelNumbers, getCurrentCardsPool } from "./Referee";
+import { getCurrentCardsPool, getGameCurrentPlayer, getNeedHandleTrick } from "./Game";
+import { Card, Color, Game } from "./model";
+import { duel, duelNumbers } from "./Referee";
 import { getPermutations } from "./util";
 
 const rmDup = (cards: Card[][]) => {
@@ -86,10 +87,7 @@ export const gameTip = (game: Game): Card[] => {
   if (needHandleTrick === undefined) {
     if (game.tricks.length === 0) return [{ color: Color.Diamond, number: 3 }];
   }
-  const cp = currentPlayer(game);
-
-  console.log("nikeName: ", cp.nikeName);
-
+  const cp = getGameCurrentPlayer(game);
   const currentCardPools = getCurrentCardsPool(game, cp);
   if (needHandleTrick === undefined) return currentCardPools.slice(0, 1);
   return tips(needHandleTrick.cards!, currentCardPools) as Card[];

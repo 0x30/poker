@@ -1,10 +1,9 @@
 import { computed, defineComponent, PropType, ref, unref } from "vue";
 import { useGames } from "../core/Games";
-import { useGame } from "../core/Game";
+import { getGamePlayers, useGame } from "../core/Game";
 
-import { Card, currentPlayer, Game, GamePlayer, Player } from "../core/model";
+import { Card, Game, GamePlayer, Player } from "../core/model";
 import Class from "../style/GameItem.module.scss";
-import { getCurrentCardsPool } from "../core/Referee";
 
 import { Desk } from "../components/modal/Desk";
 
@@ -170,23 +169,7 @@ const GameItem = defineComponent({
       unref(props.game)
     );
 
-    const splayers = computed<
-      (GamePlayer & {
-        currentPlayer: boolean;
-        leftCards: Card[];
-      })[]
-    >(() => {
-      const cp = currentPlayer(gameRef.value);
-      return gameRef.value.players.map((p) => {
-        return {
-          ...p,
-          ...{
-            currentPlayer: cp.id === p.id,
-            leftCards: getCurrentCardsPool(gameRef.value, p),
-          },
-        };
-      });
-    });
+    const splayers = computed(() => getGamePlayers(gameRef.value));
 
     return () => {
       const isFinish = gameRef.value.championer !== undefined;

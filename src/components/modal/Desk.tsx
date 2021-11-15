@@ -6,8 +6,9 @@ import {
   ref,
   unref,
 } from "@vue/runtime-core";
+import { computed } from "vue";
 import { getCardAssets } from "../../core/Card";
-import { useGame } from "../../core/Game";
+import { getGamePlayers, useGame } from "../../core/Game";
 import { Card, Game } from "../../core/model";
 
 export const DeskMenu = defineComponent({
@@ -117,20 +118,26 @@ const TrickList = defineComponent({
     },
   },
   setup: (props) => {
+    const { gameRef } = useGame(props.game);
+
     return () => {
-      const tricks = props.game.tricks.sort((a, b) => a.idx - b.idx);
+      const tricks = gameRef.value.tricks.sort((a, b) => a.idx - b.idx);
+
+      console.log("绘制");
 
       return (
         <div class="mockup-code w-1/3 gap-2 flex flex-col m-3 shadow-xl overflow-auto">
           {tricks.map((r) => (
             <>
-              <pre data-prefix="$" class="bg-success text-neutral">
-                <code>第{r.idx}回合</code>
+              <pre key={r.idx} data-prefix="$" class="bg-success text-neutral">
+                <code>第{r.idx + 1}回合</code>
               </pre>
+
               {r.tricks
+                .slice()
                 .sort((a, b) => a.createTime - b.createTime)
                 .map((cs) => (
-                  <pre data-prefix={cs.player.nikeName}>
+                  <pre key={cs.createTime} data-prefix={cs.player.nikeName}>
                     <span class="float-right mr-3 text-base-300 opacity-40">
                       {new Date(cs.createTime).toLocaleString()}
                     </span>
@@ -153,35 +160,38 @@ export const Desk = defineComponent({
     },
   },
   setup: (props) => {
-    const { gameRef, moveCursor, isPlaying, toggle } = useGame(
-      unref(props.game)
-    );
+    const { gameRef, moveCursor } = useGame(unref(props.game));
+
+    const splayers = computed(() => getGamePlayers(gameRef.value));
 
     onMounted(() => document.body.style.setProperty("overflow", "hidden"));
     onUnmounted(() => document.body.style.removeProperty("overflow"));
 
     return () => {
+      console.log("????");
+
       return (
         <div class="modal visible opacity-100 pointer-events-auto">
           <div
             class="absolute top-0 right-0 bottom-0 w-3/4 flex"
             style="background-color: #45a173;"
           >
+            回合数{gameRef.value.tricks.length}
             <TrickList game={gameRef.value} />
             <div class="grid grid-cols-2 grid-rows-2 flex-1">
               <div class="flex items-center justify-center">
                 <div class="flex">
-                  <CardGroup cards={props.game.players[0].cards} />
+                  <CardGroup cards={splayers.value[0].leftCards} />
                 </div>
               </div>
               <div class="flex items-center justify-center">
                 <div class="flex">
-                  <CardGroup cards={props.game.players[1].cards} />
+                  <CardGroup cards={splayers.value[1].leftCards} />
                 </div>
               </div>
               <div class="col-span-2 flex items-center justify-center">
                 <div class="flex">
-                  <CardGroup cards={props.game.players[2].cards} />
+                  <CardGroup cards={splayers.value[2].leftCards} />
                 </div>
               </div>
             </div>

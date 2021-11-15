@@ -1,12 +1,5 @@
-import { debugCards } from "./Card";
-import {
-  Card,
-  currentPlayer,
-  Game,
-  getNeedHandleTrick,
-  Player,
-  Trick,
-} from "./model";
+import { getGameCurrentPlayer, getNeedHandleTrick } from "./Game";
+import { Game, Player, Trick } from "./model";
 import { gameTip } from "./Tips";
 
 const TEST = true;
@@ -24,7 +17,7 @@ const timer = (time: number) => {
 };
 
 const jsFaker = async (path: string, params: any) => {
-  await timer(2000);
+  // await timer(2000);
   if (path === "/ask") {
     return {
       data: params.tips,
@@ -80,7 +73,7 @@ export const deal = (game: Game) => {
 };
 
 export const askTrick = (game: Game) => {
-  const player = currentPlayer(game);
+  const player = getGameCurrentPlayer(game);
   return cfetch(player, "/ask", {
     gameId: game.id,
     trciks: game.tricks,
