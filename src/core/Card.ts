@@ -37,16 +37,13 @@ const numberMap = {
 };
 
 export const debugCards = (cards: any) => {
-  if (cards === undefined) return "[无提示]";
-
-  return (cards as Card[])
-    .map((c) => {
-      if ((numberMap as any)[c.number] === undefined) {
-        console.log(c.number, c.color, "找不到");
-      }
-      return `${colorsMap[c.color]}${(numberMap as any)[c.number]}`;
-    })
-    .join(",");
+  if (cards === undefined) return "无卡牌";
+  const desc = (card: Card) => {
+    if (card.number === 17 || card.number === 18)
+      return `${numberMap[card.number]}`;
+    return `${colorsMap[card.color]}${(numberMap as any)[card.number]}`;
+  };
+  return (cards as Card[]).map(desc).join(",");
 };
 
 // 一副牌

@@ -71,23 +71,25 @@ export class Game {
   /// 回合数
   tricks: { tricks: Trick[]; idx: number }[] = [];
 
-  isFinished: boolean;
+  /// 胜利者
+  championer?: Player;
 
-  constructor(players: GamePlayer[]) {
+  /// 创建游戏后 是否自动开始
+  autoStart: boolean;
+
+  constructor(players: GamePlayer[], autoStart: boolean) {
     this.id = generateId();
     this.players = players;
-    this.isFinished = false;
+    this.autoStart = autoStart;
   }
 }
 
 export class GamePlayer extends Player {
-  current: Boolean;
   cards: Card[];
 
   constructor(player: Player, cards: Card[]) {
     super(player.host, player.nikeName);
     this.cards = cards;
-    this.current = false;
   }
 }
 

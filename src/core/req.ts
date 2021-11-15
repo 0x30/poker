@@ -24,7 +24,7 @@ const timer = (time: number) => {
 };
 
 const jsFaker = async (path: string, params: any) => {
-  // await timer(2000);
+  await timer(2000);
   if (path === "/ask") {
     return {
       data: params.tips,

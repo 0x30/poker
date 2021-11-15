@@ -67,6 +67,8 @@ const SelectPlayer = defineComponent({
       return Math.max(1, count);
     });
 
+    const autoStartRef = ref(true);
+
     const selectPlayers = ref<Player[]>([]);
     const isSelected = (player: Player) => {
       return selectPlayers.value.find((p) => p.id === player.id) !== undefined;
@@ -94,7 +96,7 @@ const SelectPlayer = defineComponent({
         });
         return res;
       });
-      props.onSubmit?.(result.map((r) => new Game(r)));
+      props.onSubmit?.(result.map((r) => new Game(r, autoStartRef.value)));
     };
 
     return () => {
@@ -112,16 +114,29 @@ const SelectPlayer = defineComponent({
               ))}
             </div>
 
-            <div class="form-control mt-3">
-              <label class="label">
-                <span class="label-text">每组选手的对战次数</span>
-              </label>
-              <input
-                type="number"
-                v-model={repeatCountRef.value}
-                placeholder="默认1一次，请尽可能的不要超过10次"
-                class="input input-bordered font-mono"
-              />
+            <div class="flex items-center space-x-3">
+              <div class="form-control mt-3 flex-1">
+                <label class="label">
+                  <span class="label-text">每组选手的对战次数</span>
+                </label>
+                <input
+                  type="number"
+                  v-model={repeatCountRef.value}
+                  placeholder="默认1一次，请尽可能的不要超过10次"
+                  class="input input-bordered font-mono"
+                />
+              </div>
+
+              <div class="form-control mt-3 flex flex-col">
+                <label class="label">
+                  <span class="label-text">是否自动开对战</span>
+                </label>
+                <input
+                  type="checkbox"
+                  v-model={autoStartRef.value}
+                  class="toggle toggle-lg self-center"
+                />
+              </div>
             </div>
 
             <div class="modal-action">
