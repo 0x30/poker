@@ -1,6 +1,8 @@
-import { defineComponent, PropType, ref, unref } from "vue";
-import { useGame, useGames } from "../core/Game";
-import { Game, GamePlayer } from "../core/model";
+import { defineComponent, PropType, ref, toRaw, unref } from "vue";
+import { useGames } from "../core/Games";
+import { useGame } from "../core/Game";
+
+import { Game, GamePlayer, getNeedHandleTrick } from "../core/model";
 import Class from "../style/GameItem.module.scss";
 
 const RankIcon = defineComponent(() => {
@@ -48,19 +50,23 @@ const GameItem = defineComponent({
   setup: (props) => {
     const statusRef = ref("#2094f3");
 
-    const { game, changeNextUser } = useGame(unref(props.game));
+    const { game: gg } = props;
+
+    const { gameRef, moveCursor } = useGame(gg);
+
+    getNeedHandleTrick(gameRef.value);
 
     return () => {
       return (
         <div
           class="card bg-base-100 shadow-lg px-4 py-4 grid items-center justify-items-center"
-          onClick={changeNextUser}
+          onClick={moveCursor}
         >
-          {game.players.map((p) => `${p.current}`)}
+          {gameRef.value.players.map((p) => `${p.current}`)}
           <div class={Class.item}>
-            <AvatarComp player={game.players[0]} />
-            <AvatarComp player={game.players[1]} />
-            <AvatarComp player={game.players[2]} />
+            <AvatarComp player={gameRef.value.players[0]} />
+            <AvatarComp player={gameRef.value.players[1]} />
+            <AvatarComp player={gameRef.value.players[2]} />
             <svg
               class={Class.desk}
               xmlns="http://www.w3.org/2000/svg"

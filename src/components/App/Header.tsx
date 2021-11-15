@@ -3,7 +3,7 @@ import { defineComponent } from "@vue/runtime-core";
 import { usePlayers } from "../../core/Player";
 import { useGameAlert } from "../modal/Game";
 
-import { useGames } from "../../core/Game";
+import { useGames } from "../../core/Games";
 import { usePlayerAlert } from "../modal/Player";
 
 export default defineComponent(() => {

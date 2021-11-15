@@ -11,6 +11,44 @@ const jokers: Card[] = [
   { color: 2, number: 18 },
 ];
 
+const colorsMap = {
+  [Color.Spade]: "黑桃",
+  [Color.Heart]: "红桃",
+  [Color.Diamond]: "方片",
+  [Color.Club]: "梅花",
+};
+
+const numberMap = {
+  3: "3",
+  4: "4",
+  5: "5",
+  6: "6",
+  7: "7",
+  8: "8",
+  9: "9",
+  10: "10",
+  11: "J",
+  12: "Q",
+  13: "K",
+  14: "A",
+  15: "2",
+  17: "小王",
+  18: "大王",
+};
+
+export const debugCards = (cards: any) => {
+  if (cards === undefined) return "[无提示]";
+
+  return (cards as Card[])
+    .map((c) => {
+      if ((numberMap as any)[c.number] === undefined) {
+        console.log(c.number, c.color, "找不到");
+      }
+      return `${colorsMap[c.color]}${(numberMap as any)[c.number]}`;
+    })
+    .join(",");
+};
+
 // 一副牌
 const cards = [
   ...allColors.flatMap((c) =>
@@ -37,13 +75,8 @@ const cards = [
  * 17 | foker
  */
 
-/**
- * 是否是红桃三
- * @param card 卡片
- * @returns 是否
- */
-export const isHeaderThree = (card: Card) =>
-  card.color === Color.Heart && card.number === 3;
+export const equal = (card1: Card, card2: Card) =>
+  card1.color === card2.color && card1.number === card2.number;
 
 /**
  * 获得 "跑得快" 的卡片
@@ -58,9 +91,8 @@ export const getRunFastCards = (group: number = 3) => {
         return false;
       }
     }
-    if (card.number === 14 && card.color === Color.Spade) {
-      return false;
-    }
+    if (card.number === 14 && card.color === Color.Spade) return false;
+    if (card.number === 18 || card.number === 17) return false;
     return true;
   });
   return chunk(shuffle(result), Math.floor(result.length / group));

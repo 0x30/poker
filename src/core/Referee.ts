@@ -1,4 +1,12 @@
-import { Card } from "./model";
+import { debugCards, equal } from "./Card";
+import {
+  Card,
+  currentPlayer,
+  Game,
+  getNeedHandleTrick,
+  Player,
+  Trick,
+} from "./model";
 
 export enum CardsType {
   /// 任意1张牌
@@ -227,4 +235,54 @@ export const duel = (
     curr.map((c) => c.number),
     currIsLast
   );
+};
+
+export const getCurrentCardsPool = (game: Game, player: Player) => {
+  const removeCards = game.tricks
+    .flatMap((ts) => ts.tricks.map((t) => t))
+    .filter((t) => t.player.id === player.id && t.cards !== undefined)
+    .flatMap((t) => t.cards as Card[]);
+  const initCards = game.players.find((p) => p.id === player.id)!.cards;
+  return initCards.filter(
+    (c) => removeCards.find((rc) => equal(rc, c)) === undefined
+  );
+};
+
+export const check = (game: Game, trick: Trick) => {
+  const needHandleTrick = getNeedHandleTrick(game);
+  /// 不需要进行处理排除
+  if (needHandleTrick === undefined) {
+    if (trick.cards === undefined) throw new Error("本次无需应答，必须出牌");
+  }
+
+  /// pass
+  if (trick.cards === undefined) return trick;
+  /// 牌型判断
+  if (detect(trick.cards) === undefined) throw new Error("牌型有问题");
+
+  /// 确认 出得牌 是否都在当前牌库内
+  const currentCardPolls = getCurrentCardsPool(game, trick.player);
+  if (
+    trick.cards.every(
+      (c) => currentCardPolls.find((cc) => equal(cc, c)) !== undefined
+    ) === false
+  ) {
+    throw new Error("卡牌不全，请检查");
+  }
+  if (needHandleTrick?.cards === undefined) return trick;
+  if (
+    duel(
+      needHandleTrick.cards,
+      trick.cards,
+      currentCardPolls.length === trick.cards.length
+    )
+  ) {
+    return trick;
+  }
+  throw new Error("牌型有问题，打不过");
+};
+
+export const isGameFinish = (game: Game, player: Player) => {
+  const pools = getCurrentCardsPool(game, player);
+  return pools.length === 0;
 };

@@ -1,5 +1,6 @@
-import { Card } from "./model";
-import { duel, duelNumbers } from "./Referee";
+import { debugCards } from "./Card";
+import { Card, Color, currentPlayer, Game, getNeedHandleTrick } from "./model";
+import { duel, duelNumbers, getCurrentCardsPool } from "./Referee";
 import { getPermutations } from "./util";
 
 const rmDup = (cards: Card[][]) => {
@@ -9,7 +10,7 @@ const rmDup = (cards: Card[][]) => {
   for (const cs of cards) {
     const key = cs
       .sort((a, b) => a.number - b.number)
-      .map((r) => r.number)
+      .map((r) => `${r.number}${r.color}`)
       .join("");
     if (pools[key] === undefined) {
       pools[key] = 0;
@@ -45,12 +46,16 @@ export const tips = (
   cardPools: Card[],
   justNeedOne: boolean = true
 ) => {
+  console.log("当前应付:", debugCards(cards));
+
   const targetCardSize: number[] = Array.from(new Set([cards.length, 3, 4]));
   const combs = targetCardSize.flatMap((s) => getPermutations(cardPools, s));
   let ncombs = rmDup(combs);
   const ownCombs = ncombs[justNeedOne ? "find" : "filter"](
     (comb) => duel(cards, comb, cardPools.length - comb.length === 0) === true
   );
+
+  console.log("建议出:", debugCards(ownCombs));
   return ownCombs;
 };
 
@@ -76,4 +81,16 @@ export const tipsNumbers = (
   return ownCombs;
 };
 
-(window as any).tipsNumbers = tipsNumbers;
+export const gameTip = (game: Game): Card[] => {
+  const needHandleTrick = getNeedHandleTrick(game);
+  if (needHandleTrick === undefined) {
+    if (game.tricks.length === 0) return [{ color: Color.Diamond, number: 3 }];
+  }
+  const cp = currentPlayer(game);
+
+  console.log("nikeName: ", cp.nikeName);
+
+  const currentCardPools = getCurrentCardsPool(game, cp);
+  if (needHandleTrick === undefined) return currentCardPools.slice(0, 1);
+  return tips(needHandleTrick.cards!, currentCardPools) as Card[];
+};
