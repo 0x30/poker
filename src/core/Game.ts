@@ -141,17 +141,18 @@ const __useGame = (g: Game) => {
 
   const { updateGame } = useGames();
 
-  const isPlaying = ref(gameRef.value.autoStart);
+  const isAsking = ref(false);
 
   const toggle = () => {
-    isPlaying.value = !isPlaying.value;
-    if (isPlaying.value === true) moveCursor();
+    gameRef.value.autoStart = !gameRef.value.autoStart;
+    if (gameRef.value.autoStart === true) moveCursor();
+    updateGame(gameRef.value);
   };
 
   const start = async () => {
     if (gameRef.value.championer !== undefined) return;
     await deal(gameRef.value);
-    if (isPlaying.value === true) moveCursor();
+    if (gameRef.value.autoStart === true) moveCursor();
   };
 
   const manualPlay = (player: Player, cards?: Card[]) => {
@@ -162,10 +163,12 @@ const __useGame = (g: Game) => {
   const moveCursor = async () => {
     const game = toRaw(gameRef.value);
     if (game.championer !== undefined) return;
+    isAsking.value = true;
     // 获取下一个人的出牌
     const trick = await askTrick(game);
+    isAsking.value = false;
     handleTrick(trick);
-    if (isPlaying.value === true) moveCursor();
+    if (gameRef.value.autoStart === true) moveCursor();
   };
 
   const handleTrick = (trick: Trick) => {
@@ -184,8 +187,8 @@ const __useGame = (g: Game) => {
 
   start();
   return {
+    isAsking,
     gameRef,
-    isPlaying,
     toggle,
     moveCursor,
     manualPlay,

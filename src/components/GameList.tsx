@@ -6,6 +6,7 @@ import { Card, Game, GamePlayer, Player } from "../core/model";
 import Class from "../style/GameItem.module.scss";
 
 import { Desk } from "../components/modal/Desk";
+import { GameMenu } from "./GameMenu";
 
 const AvatarComp = defineComponent({
   props: {
@@ -39,62 +40,6 @@ const AvatarComp = defineComponent({
           <span class="absolute left-1/2 top-full transform -translate-x-1/2">
             {props.player.leftCards.length}
           </span>
-        </div>
-      );
-    };
-  },
-});
-
-const GameMenu = defineComponent({
-  props: {
-    isPlaying: Boolean,
-    isFinish: Boolean,
-    onToggle: Function as PropType<() => void>,
-    onGoDetail: Function as PropType<() => void>,
-    onNext: Function as PropType<() => Promise<void>>,
-  },
-  setup: (props) => {
-    const onNextIsLoading = ref(false);
-
-    return () => {
-      return (
-        <div class="btn-group">
-          {props.isFinish === false ? (
-            <button
-              class={`btn btn-outline btn-sm ${
-                props.isPlaying ? "btn-active" : ""
-              }`}
-              onClick={props.onToggle}
-            >
-              {props.isPlaying ? (
-                <i class="gg-play-pause transform "></i>
-              ) : (
-                <i class="gg-play-button transform "></i>
-              )}
-            </button>
-          ) : null}
-
-          {props.isPlaying === false || props.isFinish ? (
-            <button class="btn btn-outline btn-sm" onClick={props.onGoDetail}>
-              <i class="gg-eye transform "></i>
-            </button>
-          ) : null}
-          {props.isFinish || props.isPlaying ? null : (
-            <>
-              <button
-                class={`btn btn-outline btn-sm px-5 ${
-                  onNextIsLoading.value ? "loading" : ""
-                }`}
-                onClick={async () => {
-                  onNextIsLoading.value = true;
-                  await props.onNext?.();
-                  onNextIsLoading.value = false;
-                }}
-              >
-                <i class="gg-play-track-next transform "></i>
-              </button>
-            </>
-          )}
         </div>
       );
     };
@@ -165,7 +110,7 @@ const GameItem = defineComponent({
     },
   },
   setup: (props) => {
-    const { gameRef, moveCursor, isPlaying, toggle } = useGame(
+    const { gameRef, moveCursor, toggle, isAsking } = useGame(
       unref(props.game)
     );
 
@@ -183,7 +128,7 @@ const GameItem = defineComponent({
         <div class="card bg-base-100 shadow-lg px-4 py-4 grid items-center justify-items-center">
           <GameStat
             leftCardNum={leftCardNum}
-            isPlaying={isPlaying.value}
+            isPlaying={gameRef.value.autoStart}
             tricks={gameRef.value.tricks.length}
             championer={gameRef.value.championer}
           />
@@ -205,8 +150,9 @@ const GameItem = defineComponent({
             </svg>
           </div>
           <GameMenu
+            isAsking={isAsking.value}
             isFinish={isFinish}
-            isPlaying={isPlaying.value}
+            isPlaying={gameRef.value.autoStart}
             onToggle={toggle}
             onNext={moveCursor}
           />

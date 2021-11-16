@@ -1,12 +1,9 @@
 import {
   defineComponent,
-  onMounted,
   onUnmounted,
   PropType,
   ref,
   unref,
-  watch,
-  watchEffect,
 } from "@vue/runtime-core";
 import { computed } from "vue";
 import { debugCard, equal, getCardAssets } from "../../core/Card";
@@ -18,47 +15,7 @@ import {
 } from "../../core/Game";
 import { Card, Game } from "../../core/model";
 import { gameTips } from "../../core/Tips";
-
-export const DeskMenu = defineComponent({
-  props: {
-    isPlaying: Boolean,
-    isFinish: Boolean,
-    onToggle: Function as PropType<() => void>,
-    onNext: Function as PropType<() => Promise<void>>,
-  },
-  setup: (props) => {
-    const onNextIsLoading = ref(false);
-
-    return () => {
-      return (
-        <ul class="menu px-3 shadow-lg bg-base-100 rounded-box horizontal fixed bottom-4 right-2">
-          <li>
-            <button>
-              <i class="gg-play-button"></i>
-            </button>
-          </li>
-          <li>
-            <a
-              class={onNextIsLoading.value ? "loading" : ""}
-              onClick={async () => {
-                onNextIsLoading.value = true;
-                await props.onNext?.();
-                onNextIsLoading.value = false;
-              }}
-            >
-              <i class="gg-play-track-next"></i>
-            </a>
-          </li>
-          <li>
-            <button>
-              <i class="gg-close"></i>
-            </button>
-          </li>
-        </ul>
-      );
-    };
-  },
-});
+import { GameMenu } from "../GameMenu";
 
 export const CardComp = defineComponent({
   props: {
@@ -87,82 +44,67 @@ enum CardGroupSize {
   big,
 }
 
-const useHand = (
-  cards: Card[],
-  isHand: boolean,
-  select?: (idx: number[]) => void
-) => {
-  console.log("???", isHand);
-
-  if (isHand !== true) return { destory: () => {} };
-
-  const startCardIdxRef = ref<number>();
-  const overCardIdxRef = ref<number>();
-
-  const onCardMouseDown = (idx: number) => {
-    startCardIdxRef.value = idx;
-    overCardIdxRef.value = idx;
-  };
-  const onCardMouseOver = (idx: number) => (overCardIdxRef.value = idx);
-
-  const overSelectIds = computed(() => {
-    const over = overCardIdxRef.value;
-    const start = startCardIdxRef.value;
-    if (over == undefined || start === undefined) return [];
-    return [...cards.keys()].slice(
-      Math.min(over, start),
-      Math.max(over, start) + 1
-    );
-  });
-
-  const onMouseUp = () => {
-    select?.(overSelectIds.value);
-    startCardIdxRef.value = undefined;
-    overCardIdxRef.value = undefined;
-  };
-
-  document.addEventListener("mouseup", onMouseUp);
-
-  return {
-    overSelectIds,
-    onCardMouseDown,
-    onCardMouseOver,
-    destory: () => document.removeEventListener("mouseup", onMouseUp),
-  };
-};
-
 const CardGroup = defineComponent({
   props: {
     ishand: Boolean,
     selectIdxs: Set as PropType<Set<number>>,
     onSelectIdxs: Function as PropType<(idxs: number[]) => void>,
     size: Number as PropType<CardGroupSize>,
-    cards: Array as PropType<Card[]>,
+    cards: {
+      type: Array as PropType<Card[]>,
+      required: true,
+    },
   },
   setup: (props) => {
-    const { overSelectIds, onCardMouseDown, onCardMouseOver, destory } =
-      useHand(props.cards!, props.ishand, props.onSelectIdxs);
+    const startCardIdxRef = ref<number>();
+    const overCardIdxRef = ref<number>();
 
-    onUnmounted(destory);
+    const onCardMouseDown = (idx: number) => {
+      startCardIdxRef.value = idx;
+      overCardIdxRef.value = idx;
+    };
+    const onCardMouseOver = (idx: number) => (overCardIdxRef.value = idx);
+
+    const overSelectIds = computed(() => {
+      const over = overCardIdxRef.value;
+      const start = startCardIdxRef.value;
+      if (over == undefined || start === undefined) return [];
+      return [...props.cards.keys()].slice(
+        Math.min(over, start),
+        Math.max(over, start) + 1
+      );
+    });
+
+    const onMouseUp = () => {
+      props.onSelectIdxs?.(overSelectIds.value);
+      startCardIdxRef.value = undefined;
+      overCardIdxRef.value = undefined;
+    };
+
+    document.addEventListener("mouseup", onMouseUp);
+    onUnmounted(() => document.removeEventListener("mouseup", onMouseUp));
 
     return () => {
+      const cardClass = () => {
+        const ccs: string[] = [];
+        if (props.size === CardGroupSize.small) ccs.push("w-3 h-20 relative");
+        else ccs.push("w-4 h-28 relative");
+        if (props.ishand) ccs.push("pointer-events-auto");
+        else ccs.push("pointer-events-none");
+        return ccs;
+      };
+
       if (props.cards === undefined) return <div>PASS!</div>;
-      const cardId = (card: Card) => `${card.color}${card.number}`;
       return (
         <div class="flex pointer-events-auto visible opacity-100 pr-14 overflow-visible">
-          <span>..{props.ishand ? "true" : "false"}..</span>
           {props.cards
             .sort((a, b) => b.number - a.number)
             .map((card, idx) => (
               <div
                 onMousedown={() => onCardMouseDown?.(idx)}
                 onMousemove={() => onCardMouseOver?.(idx)}
-                key={cardId(card)}
-                class={
-                  props.size === CardGroupSize.small
-                    ? "w-3 h-20 relative"
-                    : "w-4 h-28 relative"
-                }
+                key={debugCard(card)}
+                class={cardClass()}
               >
                 <CardComp
                   card={card}
@@ -190,9 +132,6 @@ const TrickList = defineComponent({
 
     return () => {
       const tricks = gameRef.value.tricks.sort((a, b) => a.idx - b.idx);
-
-      console.log("绘制");
-
       return (
         <div class="mockup-code w-1/3 gap-2 flex flex-col m-3 shadow-xl overflow-auto">
           {tricks.map((r) => (
@@ -209,7 +148,11 @@ const TrickList = defineComponent({
                     <span class="float-right mr-3 text-base-300 opacity-40">
                       {new Date(cs.createTime).toLocaleString()}
                     </span>
-                    <CardGroup size={CardGroupSize.small} cards={cs.cards} />
+                    {cs.cards ? (
+                      <CardGroup size={CardGroupSize.small} cards={cs.cards} />
+                    ) : (
+                      <span>过</span>
+                    )}
                   </pre>
                 ))}
             </>
@@ -234,10 +177,13 @@ const DeskPlayer = defineComponent({
   setup: (props) => {
     const selectIdxRef = ref<Set<number>>(new Set());
 
-    const { gameRef, moveCursor, manualPlay } = useGame(props.game);
+    const { gameRef, moveCursor, manualPlay, isAsking } = useGame(props.game);
     const player = computed(() => getGamePlayers(gameRef.value)[props.index]);
     const isCurrentPlayer = computed(() => {
-      return getGameCurrentPlayer(gameRef.value).id === player.value.id;
+      const isCurrent =
+        getGameCurrentPlayer(gameRef.value).id === player.value.id;
+      if (isCurrent === false) selectIdxRef.value.clear();
+      return isCurrent;
     });
 
     const onSelectIdxs = (idxs: number[]) => {
@@ -255,6 +201,14 @@ const DeskPlayer = defineComponent({
     const tipCards = computed(() =>
       gameTips(gameRef.value).sort((a, b) => a.weight - b.weight)
     );
+
+    /// 当前用户是否是冠军
+    const isChampioner = computed(
+      () => gameRef.value.championer?.id === player.value.id
+    );
+
+    /// 游戏是否完毕
+    const isFinished = computed(() => gameRef.value.championer !== undefined);
 
     let tipIndex = 0;
     const tip = () => {
@@ -280,57 +234,81 @@ const DeskPlayer = defineComponent({
 
     return () => {
       const lastCards = () => {
+        if (isFinished.value === true) return null;
         const tricks = player.value.lastTrick;
         if (tricks && isCurrentPlayer.value === false) {
-          if (tricks) {
+          if (tricks.cards)
             return (
               <CardGroup cards={tricks.cards} size={CardGroupSize.small} />
             );
-          } else return <span>要不起</span>;
+          else return <span>要不起</span>;
         } else return null;
       };
 
+      const btns = () => {
+        if (isFinished.value === true) {
+          if (isChampioner.value === true)
+            return <span class="text-3xl">🎉🎉获胜🎉🎉</span>;
+          return null;
+        }
+
+        if (gameRef.value.autoStart === true) {
+          if (isCurrentPlayer.value === true) return <span>等待出牌...</span>;
+          else return null;
+        }
+
+        if (isCurrentPlayer.value) {
+          return (
+            <>
+              <button
+                class="btn btn-sm"
+                disabled={selectIdxRef.value.size === 0}
+                onClick={manual}
+              >
+                手动出牌
+              </button>
+              <button
+                class="btn btn-sm"
+                disabled={!isCanSkip.value}
+                onClick={() => manualPlay(player.value)}
+              >
+                过
+              </button>
+              <button
+                class="btn btn-sm"
+                disabled={!isCanTip.value}
+                onClick={tip}
+              >
+                提示
+              </button>
+              <button
+                class={`btn btn-sm ${isAsking.value ? "loading" : ""}`}
+                onClick={moveCursor}
+              >
+                自动出牌
+              </button>
+            </>
+          );
+        } else null;
+      };
+
+      /// 如果是第三个试图的话，出牌和控制器 颠倒顺序
+      const flexdri = props.index === 2 ? "flex-col-reverse" : "flex-col";
+
       return (
-        <div
-          class={`flex items-center justify-center ${
-            props.index === 2 ? "flex-col-reverse" : "flex-col"
-          }`}
-        >
-          <div
-            class={`space-x-2 ${
-              isCurrentPlayer.value ? "opacity-1" : "opacity-0"
-            }`}
-          >
-            <span>{player.value.nikeName}</span>
-            <button
-              class="btn btn-sm"
-              disabled={selectIdxRef.value.size === 0}
-              onClick={manual}
-            >
-              手动出牌
-            </button>
-            <button
-              class="btn btn-sm"
-              disabled={!isCanSkip.value}
-              onClick={() => manualPlay(player.value)}
-            >
-              过
-            </button>
-            <button class="btn btn-sm" disabled={!isCanTip.value} onClick={tip}>
-              提示
-            </button>
-            <button class="btn btn-sm" onClick={moveCursor}>
-              自动出牌
-            </button>
+        <div class={`flex items-center justify-center ${flexdri}`}>
+          <div class={`space-x-2 h-1/3 flex items-center`}>{btns()}</div>
+          <div class="h-1/3 flex items-center">
+            <CardGroup
+              onSelectIdxs={onSelectIdxs}
+              selectIdxs={selectIdxRef.value}
+              cards={
+                isFinished.value ? player.value.cards : player.value.leftCards
+              }
+              ishand={isCurrentPlayer.value}
+            />
           </div>
-          <CardGroup
-            class="my-8 h-2/5"
-            onSelectIdxs={onSelectIdxs}
-            selectIdxs={selectIdxRef.value}
-            cards={player.value.leftCards}
-            ishand={isCurrentPlayer.value}
-          />
-          <div class="h-1/4">{lastCards()}</div>
+          <div class="h-1/3 flex items-center">{lastCards()}</div>
         </div>
       );
     };
@@ -345,7 +323,11 @@ export const Desk = defineComponent({
     },
   },
   setup: (props) => {
-    const { gameRef, moveCursor } = useGame(unref(props.game));
+    const { gameRef, moveCursor, toggle, isAsking } = useGame(
+      unref(props.game)
+    );
+    /// 游戏是否完毕
+    const isFinish = computed(() => gameRef.value.championer !== undefined);
 
     return () => {
       return (
@@ -365,7 +347,14 @@ export const Desk = defineComponent({
                 />
               ))}
             </div>
-            <DeskMenu onNext={moveCursor} />
+            <GameMenu
+              isAsking={isAsking.value}
+              class="absolute bottom-4 right-2"
+              isFinish={isFinish.value}
+              isPlaying={gameRef.value.autoStart}
+              onToggle={toggle}
+              onNext={moveCursor}
+            />
           </div>
         </div>
       );
