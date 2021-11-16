@@ -19,3 +19,15 @@ export const getPermutations = <T>(array: Array<T>, size: number): T[][] => {
   p([], 0);
   return result;
 };
+
+export const useCache = <T>() => {
+  const pools: { [key: string]: T } = {};
+
+  return (key: string, gen: () => T) => {
+    const res = pools[key];
+    if (res) return res;
+    const nres = gen();
+    pools[key] = nres;
+    return nres;
+  };
+};

@@ -30,6 +30,16 @@ export interface Result {
   weight: number;
 }
 
+export const debugResult = (result: Result) => {
+  switch (result.type) {
+    case CardsType.dan:
+      break;
+
+    default:
+      break;
+  }
+};
+
 /**
  * 判断给定的数组是否完全相等
  * 如果 target 存在那么，将会和目标匹配

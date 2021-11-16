@@ -36,14 +36,21 @@ const numberMap = {
   18: "大王",
 };
 
-export const debugCards = (cards: any) => {
-  if (cards === undefined) return "无卡牌";
+export const debugCard = (cards: Card) => {
   const desc = (card: Card) => {
     if (card.number === 17 || card.number === 18)
       return `${numberMap[card.number]}`;
     return `${colorsMap[card.color]}${(numberMap as any)[card.number]}`;
   };
-  return (cards as Card[]).map(desc).join(",");
+  return desc(cards);
+};
+
+export const debugCards = (cards: any) => {
+  if (cards === undefined) return "无卡牌";
+  return (cards as Card[])
+    .sort((a, b) => a.number - b.number)
+    .map(debugCard)
+    .join(",");
 };
 
 // 一副牌
