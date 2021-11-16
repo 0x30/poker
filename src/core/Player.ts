@@ -11,6 +11,10 @@ const db = localforage.createInstance({
 const players = ref<Player[]>([]);
 const queues: { [key: string]: Queue } = {};
 
+export const equal = (player?: Player, player2?: Player) => {
+  return player?.id === player2?.id;
+};
+
 export const usePlayers = () => {
   const refreshPlayers = async () => {
     const keys = await db.keys();
@@ -32,36 +36,12 @@ export const usePlayers = () => {
     refreshPlayers();
   };
 
-  const addCount = async (
-    player: Player,
-    paramNamme: "joinCount" | "victoryCount"
-  ) => {
-    const p = await db.getItem<Player>(player.id);
-    if (p) {
-      const result = { ...p, ...{ [paramNamme]: (p[paramNamme] ?? 0) + 1 } };
-      await db.setItem(player.id, result);
-      refreshPlayers();
-    }
-  };
-
-  const exec = (player: Player, func: () => Promise<unknown>) => {
-    queues[player.id]?.add(func);
-    queues[player.id]?.start();
-  };
-
-  const addJoinCount = (player: Player) =>
-    exec(player, () => addCount(player, "joinCount"));
-  const addVictoryCount = (player: Player) =>
-    exec(player, () => addCount(player, "victoryCount"));
-
   refreshPlayers();
 
   return {
     players,
     addPlayer,
     delPlayer,
-    addJoinCount,
-    addVictoryCount,
   };
 };
 

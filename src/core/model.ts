@@ -33,19 +33,12 @@ export class Player {
   // 主机地址
   host: string;
 
-  // 加入次数
-  joinCount: number;
-  // 胜利次数
-  victoryCount: number;
-
   // 创建时间
   createTime: number;
 
   constructor(host: string, nikeName?: string) {
     this.id = generateId();
     this.nikeName = nikeName;
-    this.joinCount = 0;
-    this.victoryCount = 0;
     this.host = host;
     this.createTime = new Date().getTime();
   }
@@ -88,6 +81,7 @@ export class GamePlayer extends Player {
 
   constructor(player: Player, cards: Card[]) {
     super(player.host, player.nikeName);
+    this.id = player.id
     this.cards = cards;
   }
 }

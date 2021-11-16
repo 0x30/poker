@@ -1,5 +1,5 @@
 import localforage from "localforage";
-import { ref } from "vue";
+import { ref, triggerRef } from "vue";
 import { Player, Game } from "./model";
 import Queue from "p-queue";
 
@@ -37,11 +37,12 @@ export const useGames = () => {
     queues[game.id]?.start();
   };
 
-  const updateGame = (game: Game) => {
-    exec(
+  const updateGame = async (game: Game) => {
+    await exec(
       game,
       async () => await db.setItem(game.id, JSON.parse(JSON.stringify(game)))
     );
+    refreshGames();
   };
 
   refreshGames();

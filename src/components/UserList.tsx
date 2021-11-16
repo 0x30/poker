@@ -1,6 +1,7 @@
-import { defineComponent, PropType } from "vue";
-import { usePlayers } from "../core/Player";
+import { computed, defineComponent, PropType } from "vue";
+import { equal, usePlayers } from "../core/Player";
 import { Player } from "../core/model";
+import { useGames } from "../core/Games";
 
 const UserCard = defineComponent({
   props: {
@@ -10,6 +11,19 @@ const UserCard = defineComponent({
     },
   },
   setup: (props) => {
+    const { games } = useGames();
+
+    const joinCount = computed(
+      () =>
+        games.value.filter(
+          (g) => g.players.find((p) => equal(p, props.player)) !== undefined
+        ).length
+    );
+
+    const victoryCount = computed(
+      () => games.value.filter((g) => equal(g.championer, props.player)).length
+    );
+
     return () => {
       return (
         <div class="card shadow-lg compact side bg-base-100 px-4 py-3">
@@ -18,7 +32,7 @@ const UserCard = defineComponent({
               <div class="flex flex-col items-center">
                 <span class="text-xs text-gray-500">参与对战</span>
                 <span class="text-sm font-mono font-black">
-                  {props.player.joinCount}
+                  {joinCount.value}
                 </span>
               </div>
               <div class="avatar placeholder">
@@ -29,7 +43,7 @@ const UserCard = defineComponent({
               <div class="flex flex-col items-center">
                 <span class="text-xs text-gray-500">获得胜利</span>
                 <span class="text-sm font-mono font-black">
-                  {props.player.victoryCount}
+                  {victoryCount.value}
                 </span>
               </div>
             </div>
@@ -48,21 +62,9 @@ const UserCard = defineComponent({
   },
 });
 
-const UserList = defineComponent({
-  props: {
-    modelValue: {
-      type: Array as PropType<Player[]>,
-      default: [],
-    },
-  },
-  emits: ["update:modelValue"],
-  setup: (props) => {
-    const { players, addPlayer, addJoinCount, addVictoryCount } = usePlayers();
-
-    const add = () => {
-      addPlayer(new Player("187878"));
-    };
-
+export default defineComponent({
+  setup: () => {
+    const { players } = usePlayers();
     return () => {
       return (
         <div class="grid grid-rows-1 grid-cols-1 lg:grid-cols-2 xl:grid-cols-6 gap-3">
@@ -74,5 +76,3 @@ const UserList = defineComponent({
     };
   },
 });
-
-export default UserList;
