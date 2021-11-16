@@ -1,6 +1,8 @@
 import {
   defineComponent,
+  onMounted,
   onUnmounted,
+  onUpdated,
   PropType,
   ref,
   unref,
@@ -15,9 +17,10 @@ import {
 } from "../../core/Game";
 import { Card, Game } from "../../core/model";
 import { gameTips } from "../../core/Tips";
+import { useMountComponentAndAnimed } from "../../core/useMountComponentAndAnimed";
 import { GameMenu } from "../GameMenu";
 
-export const CardComp = defineComponent({
+const CardComp = defineComponent({
   props: {
     card: {
       required: true,
@@ -130,10 +133,27 @@ const TrickList = defineComponent({
   setup: (props) => {
     const { gameRef } = useGame(props.game);
 
+    const listRef = ref<HTMLElement>();
+
+    const scrollToBottom = () => {
+      if (listRef.value) {
+        listRef.value.scrollTo({
+          top: listRef.value.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+    };
+
+    onMounted(scrollToBottom);
+    onUpdated(scrollToBottom);
+
     return () => {
       const tricks = gameRef.value.tricks.sort((a, b) => a.idx - b.idx);
       return (
-        <div class="mockup-code w-1/3 gap-2 flex flex-col m-3 shadow-xl overflow-auto">
+        <div
+          ref={listRef}
+          class="mockup-code w-1/3 gap-2 flex flex-col m-3 overflow-auto relative"
+        >
           {tricks.map((r) => (
             <>
               <pre key={r.idx} data-prefix="$" class="bg-success text-neutral">
@@ -315,14 +335,17 @@ const DeskPlayer = defineComponent({
   },
 });
 
-export const Desk = defineComponent({
+const Desk = defineComponent({
   props: {
+    onClose: Function as PropType<() => void>,
     game: {
       type: Object as PropType<Game>,
       required: true,
     },
   },
   setup: (props) => {
+    const isShowDetail = ref(false);
+
     const { gameRef, moveCursor, toggle, isAsking } = useGame(
       unref(props.game)
     );
@@ -336,7 +359,13 @@ export const Desk = defineComponent({
             class="absolute top-0 right-0 bottom-0 w-3/4 flex"
             style="background-color: #45a173;"
           >
-            {/* <TrickList game={gameRef.value} /> */}
+            <button
+              class="btn btn-circle btn absolute right-3 top-3"
+              onClick={() => (isShowDetail.value = !isShowDetail.value)}
+            >
+              <i class="gg-menu-boxed"></i>
+            </button>
+            {isShowDetail.value ? <TrickList game={gameRef.value} /> : null}
             <div class="grid grid-cols-2 grid-rows-2 flex-1">
               {gameRef.value.players.map((p, i) => (
                 <DeskPlayer
@@ -348,6 +377,7 @@ export const Desk = defineComponent({
               ))}
             </div>
             <GameMenu
+              onClose={props.onClose}
               isAsking={isAsking.value}
               class="absolute bottom-4 right-2"
               isFinish={isFinish.value}
@@ -361,3 +391,9 @@ export const Desk = defineComponent({
     };
   },
 });
+
+export const useDeskDrawer = (game: Game) => {
+  const close = useMountComponentAndAnimed({
+    component: <Desk game={game} onClose={() => close()} />,
+  });
+};

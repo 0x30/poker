@@ -5,6 +5,7 @@ export const GameMenu = defineComponent({
     isAsking: Boolean,
     isPlaying: Boolean,
     isFinish: Boolean,
+    onClose: Function as PropType<() => void>,
     onToggle: Function as PropType<() => void>,
     onGoDetail: Function as PropType<() => void>,
     onNext: Function as PropType<() => Promise<void>>,
@@ -47,6 +48,12 @@ export const GameMenu = defineComponent({
               </button>
             </>
           )}
+
+          {props.onClose ? (
+            <button class="btn btn-sm btn-outline" onClick={props.onClose}>
+              <i class="gg-close"></i>
+            </button>
+          ) : null}
         </div>
       );
     };
