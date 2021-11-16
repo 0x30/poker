@@ -58,7 +58,7 @@ export class Trick {
 
   constructor(player: Player, cards: Card[] | undefined) {
     this.createTime = new Date().getTime();
-    this.player = player;
+    this.player = { ...player, ...{ cards: undefined } };
     this.cards = cards;
   }
 }

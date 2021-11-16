@@ -135,3 +135,5 @@ export const getCardAssets = (card: Card) => {
 
   return new URL(`../assets/cards/${name()}.svg`, import.meta.url).href;
 };
+
+export const firstCard: Card = { color: Color.Diamond, number: 3 };

@@ -79,7 +79,7 @@ export const askTrick = (game: Game) => {
     trciks: game.tricks,
     tips: gameTip(game),
     needHandleTrick: getNeedHandleTrick(game),
-  }).then((res) => new Trick({ ...player, ...{ cards: undefined } }, res.data));
+  }).then((res) => new Trick(player, res.data));
 };
 
 export const broadcast = (game: Game, trick: Trick) => {

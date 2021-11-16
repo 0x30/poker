@@ -1,5 +1,5 @@
 import { ref, toRaw, triggerRef } from "vue";
-import { equal } from "./Card";
+import { debugCard, equal, firstCard } from "./Card";
 import { useGames } from "./Games";
 import { Card, Color, Game, Player, Trick } from "./model";
 import { detect, duel } from "./Referee";
@@ -12,7 +12,7 @@ import { askTrick, deal } from "./req";
  * @returns 是否
  */
 const hasDiamond3 = (cards: Card[]) =>
-  cards.findIndex((c) => c.color === Color.Diamond && c.number === 3) !== -1;
+  cards.findIndex((c) => equal(c, firstCard)) !== -1;
 
 const getGameLastTricks = (game: Game): Trick[] | undefined => {
   return game.tricks
@@ -52,6 +52,10 @@ export const check = (game: Game, trick: Trick) => {
   /// 不需要进行处理排除
   if (needHandleTrick === undefined) {
     if (trick.cards === undefined) throw new Error("本次无需应答，必须出牌");
+
+    if (game.tricks.length === 0 && hasDiamond3(trick.cards) === false) {
+      throw new Error(`首轮出牌，必须存在 ${debugCard(firstCard)}`);
+    }
   }
 
   /// pass
@@ -84,10 +88,12 @@ export const check = (game: Game, trick: Trick) => {
 /**
  * 检查游戏是否完成
  */
-export const isGameFinish = (game: Game, player: Player) => {
+export const checkGameFinish = (game: Game, player: Player) => {
   const pools = getCurrentCardsPool(game, player);
   return pools.length === 0;
 };
+
+export const isGameFinish = (game: Game) => game.championer !== undefined;
 
 /**
  * 获取游戏当前的用户
@@ -106,6 +112,11 @@ export const getGameCurrentPlayer = (game: Game) => {
   return game.players[(li + 2) % 3];
 };
 
+export const getGamePlayerLastCards = (game: Game, player: Player) => {
+  if (game.tricks.length === 0) return undefined;
+  return getGameLastTricks(game)?.find((t) => t.player.id === player.id);
+};
+
 /**
  * 获取游戏玩家的深入信息
  */
@@ -115,6 +126,7 @@ export const getGamePlayers = (game: Game) => {
     return {
       ...p,
       ...{
+        lastTrick: getGamePlayerLastCards(game, p),
         currentPlayer: cp.id === p.id,
         leftCards: getCurrentCardsPool(game, p),
       },
@@ -142,22 +154,32 @@ const __useGame = (g: Game) => {
     if (isPlaying.value === true) moveCursor();
   };
 
+  const manualPlay = (player: Player, cards?: Card[]) => {
+    const trick = new Trick(player, cards);
+    handleTrick(trick);
+  };
+
   const moveCursor = async () => {
     const game = toRaw(gameRef.value);
     if (game.championer !== undefined) return;
     // 获取下一个人的出牌
     const trick = await askTrick(game);
+    handleTrick(trick);
+    if (isPlaying.value === true) moveCursor();
+  };
+
+  const handleTrick = (trick: Trick) => {
+    const game = toRaw(gameRef.value);
     const needHandleTrick = getNeedHandleTrick(game);
     const t = check(game, trick);
     if (needHandleTrick === undefined) {
       game.tricks.push({ idx: game.tricks.length, tricks: [t] });
     } else getGameLastTricks(game)?.push(trick);
 
-    if (isGameFinish(game, trick.player)) game.championer = trick.player;
+    if (checkGameFinish(game, trick.player)) game.championer = trick.player;
     gameRef.value = game;
     triggerRef(gameRef);
     updateGame(game);
-    if (isPlaying.value === true) moveCursor();
   };
 
   start();
@@ -166,6 +188,7 @@ const __useGame = (g: Game) => {
     isPlaying,
     toggle,
     moveCursor,
+    manualPlay,
   };
 };
 

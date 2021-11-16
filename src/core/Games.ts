@@ -38,7 +38,10 @@ export const useGames = () => {
   };
 
   const updateGame = (game: Game) => {
-    exec(game, async () => await db.setItem(game.id, game));
+    exec(
+      game,
+      async () => await db.setItem(game.id, JSON.parse(JSON.stringify(game)))
+    );
   };
 
   refreshGames();
