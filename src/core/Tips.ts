@@ -23,9 +23,18 @@ const rmDup = (cards: Card[][]) => {
 const tips = (cards: Card[], cardPools: Card[]) => {
   const targetCardSize: number[] = Array.from(new Set([cards.length, 2, 4]));
   const combs = targetCardSize.flatMap((s) => getPermutations(cardPools, s));
-  return rmDup(combs).filter(
+  const result = rmDup(combs).filter(
     (comb) => duel(cards, comb, cardPools.length - comb.length === 0) === true
   );
+  const resPools: { [key: string]: 0 } = {};
+  return result.filter((r) => {
+    const res = r.map((r) => r.number).join("");
+    if (resPools[res] === undefined) {
+      resPools[res] = 0;
+      return true;
+    }
+    return false;
+  });
 };
 
 const _gameTips = (game: Game): (Result & { cards: Card[] })[] => {
