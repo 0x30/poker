@@ -5,7 +5,7 @@ import {
   getNeedHandleTrick,
 } from "./Game";
 import { Card, Color, Game } from "./model";
-import { detect, duel, duelNumbers, Result } from "./Referee";
+import { detect, duel, Result } from "./Referee";
 import { getPermutations, useCache } from "./util";
 
 const rmDup = (cards: Card[][]) => {
@@ -21,7 +21,7 @@ const rmDup = (cards: Card[][]) => {
  * 获取推荐的片组集合
  */
 const tips = (cards: Card[], cardPools: Card[]) => {
-  const targetCardSize: number[] = Array.from(new Set([cards.length, 3, 4]));
+  const targetCardSize: number[] = Array.from(new Set([cards.length, 2, 4]));
   const combs = targetCardSize.flatMap((s) => getPermutations(cardPools, s));
   return rmDup(combs).filter(
     (comb) => duel(cards, comb, cardPools.length - comb.length === 0) === true

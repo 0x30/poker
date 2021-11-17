@@ -127,8 +127,13 @@ export const detectTypeNumbers = (numbers: number[]): Result | undefined => {
   if (numbers.length === 0) return undefined;
   if (numbers.length === 1) return { type: CardsType.dan, weight: numbers[0] };
 
-  if (numbers.length === 2 && same(numbers)) {
-    return { type: CardsType.dui, weight: numbers[0] };
+  if (numbers.length === 2) {
+    if (numbers.every((n) => [17, 18].includes(n))) {
+      return { type: CardsType.zhadan, weight: Math.max(...numbers) };
+    }
+    if (same(numbers)) {
+      return { type: CardsType.dui, weight: numbers[0] };
+    }
   }
 
   if (numbers.length === 3 && same(numbers)) {
