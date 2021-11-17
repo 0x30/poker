@@ -1,45 +1,17 @@
 import { getGameCurrentPlayer, getNeedHandleTrick } from "./Game";
-import { Game, Player, Trick } from "./model";
+import { Game, isNpc, isRobot, isWoodMan, Player, Trick } from "./model";
 import { gameTip } from "./Tips";
-
-const TEST = true;
 
 const url = (player: Player, path: string) => {
   return `http://${player.host}${path}`;
 };
 
-const timer = (time: number) => {
-  return new Promise<void>((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, time);
-  });
-};
-
-const jsFaker = async (path: string, params: any) => {
-  // await timer(2000);
-  if (path === "/ask") {
-    return {
-      data: params.tips,
-    };
-  }
-
-  if (path === "/ready") {
-    return {
-      data: true,
-    };
-  }
-};
-
 const cfetch = (player: Player, path: string, body: any) => {
-  if (TEST) {
-    return jsFaker(path, body);
-  }
   const params =
     body === undefined
       ? undefined
       : {
-          body: JSON.stringify(body),
+          body: JSON.stringify({ ...body, ...{ userId: player.id } }),
           headers: { "content-type": "application/json" },
           method: "POST",
         };
@@ -57,7 +29,9 @@ export const ready = async (game: Game) => {
         .catch(() => resolve(false));
     });
   };
-  const res = await Promise.all(game.players.map(req));
+  const res = await Promise.all(
+    game.players.filter((p) => isNpc(p) === false).map(req)
+  );
   return res.every((v) => v);
 };
 
@@ -66,14 +40,16 @@ export const ready = async (game: Game) => {
  */
 export const deal = (game: Game) => {
   return Promise.all(
-    game.players.map((p) =>
-      cfetch(p, "/deal", { gameId: game.id, cards: p.cards })
-    )
+    game.players
+      .filter((p) => isNpc(p) === false)
+      .map((p) => cfetch(p, "/deal", { gameId: game.id, cards: p.cards }))
   );
 };
 
 export const askTrick = (game: Game) => {
   const player = getGameCurrentPlayer(game);
+  if (isWoodMan(player)) return Promise.resolve(new Trick(player, undefined));
+  if (isRobot(player)) return Promise.resolve(new Trick(player, gameTip(game)));
   return cfetch(player, "/ask", {
     gameId: game.id,
     trciks: game.tricks,
@@ -85,17 +61,11 @@ export const askTrick = (game: Game) => {
 export const broadcast = (game: Game, trick: Trick) => {
   return Promise.all(
     game.players
-      // .filter((p) => p.id !== trick.player.id)
+      .filter((p) => isNpc(p) === false)
       .map((p) =>
-        fetch(url(p, "/broadcast"), {
-          body: JSON.stringify({
-            gameId: game.id,
-            trick,
-          }),
-          headers: {
-            "content-type": "application/json",
-          },
-          method: "POST",
+        cfetch(p, "/broadcast", {
+          gameId: game.id,
+          trick,
         })
       )
   );

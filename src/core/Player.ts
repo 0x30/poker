@@ -1,7 +1,14 @@
 import { ref } from "vue";
 import localforage from "localforage";
 import Queue from "p-queue";
-import { Player } from "./model";
+import {
+  Player,
+  WoodmanPlayer,
+  RobotPlayer,
+  Robot2Player,
+  isNpc,
+  Robot3Player,
+} from "./model";
 
 const db = localforage.createInstance({
   name: "plyers",
@@ -36,7 +43,25 @@ export const usePlayers = () => {
     refreshPlayers();
   };
 
+  const joinNpc = async () => {
+    const keys = await db.keys();
+    var needR = false;
+    for await (const player of [
+      WoodmanPlayer,
+      RobotPlayer,
+      Robot2Player,
+      Robot3Player,
+    ]) {
+      if (!keys.includes(player.id)) {
+        needR = true;
+        await db.setItem(player.id, player);
+      }
+    }
+    if (needR) refreshPlayers();
+  };
+
   refreshPlayers();
+  joinNpc();
 
   return {
     players,
@@ -50,5 +75,5 @@ export const playerName = (player: Player) => {
 };
 
 export const playerNameCode = (player: Player) => {
-  return playerName(player).slice(0, 1);
+  return isNpc(player) ? player.nikeName : playerName(player).slice(0, 1);
 };

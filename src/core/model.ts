@@ -44,6 +44,46 @@ export class Player {
   }
 }
 
+export const WoodmanPlayer: Player = {
+  nikeName: "🪵",
+  id: "wooden",
+  host: "木头人，只会跳过",
+  createTime: 1,
+};
+
+export const RobotPlayer: Player = {
+  nikeName: "🤖️",
+  id: "robot",
+  host: "机器人1",
+  createTime: 1,
+};
+
+export const Robot2Player: Player = {
+  nikeName: "👽",
+  id: "robot2",
+  host: "机器人2",
+  createTime: 1,
+};
+
+export const Robot3Player: Player = {
+  nikeName: "💀",
+  id: "robot3",
+  host: "机器人3",
+  createTime: 1,
+};
+
+export const isNpc = (player: Player) => {
+  return isRobot(player) || isWoodMan(player);
+};
+
+export const isWoodMan = (player: Player) => {
+  return player.id === WoodmanPlayer.id;
+};
+
+export const isRobot = (player: Player) => {
+  return [RobotPlayer.id, Robot2Player.id, Robot3Player.id].includes(player.id);
+};
+
 export class Trick {
   createTime: number;
   player: Player;
@@ -81,7 +121,7 @@ export class GamePlayer extends Player {
 
   constructor(player: Player, cards: Card[]) {
     super(player.host, player.nikeName);
-    this.id = player.id
+    this.id = player.id;
     this.cards = cards;
   }
 }

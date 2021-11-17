@@ -1,6 +1,13 @@
 // https://github.com/selfthinker/CSS-Playing-Cards
 import { shuffle, chunk } from "lodash";
-import { Card, Color } from "./model";
+import {
+  Card,
+  Color,
+  GamePlayer,
+  isWoodMan,
+  Player,
+  WoodmanPlayer,
+} from "./model";
 
 // 所有花色
 const allColors = [Color.Club, Color.Diamond, Color.Heart, Color.Spade];
@@ -82,24 +89,24 @@ export const deskCards = [
 export const equal = (card1: Card, card2: Card) =>
   card1.color === card2.color && card1.number === card2.number;
 
-/**
- * 获得 "跑得快" 的卡片
- * 直接随机，并且分成三份
- * @returns 分成三份的随机扑克牌卡组
- */
-export const getRunFastCards = (group: number = 3) => {
-  // 跑得快游戏共使用48张牌，去掉大、小王，红桃2，方片2，梅花2和黑桃A
-  const result = deskCards.filter((card) => {
-    if (card.number === 15) {
-      if ([Color.Club, Color.Diamond, Color.Spade].includes(card.color)) {
-        return false;
-      }
-    }
-    if (card.number === 14 && card.color === Color.Spade) return false;
-    if (card.number === 18 || card.number === 17) return false;
-    return true;
-  });
-  return chunk(shuffle(result), Math.floor(result.length / group));
+export const splitCards = (players: Player[]): GamePlayer[] => {
+  const hasWoodMan = players.find((p) => isWoodMan(p));
+  const result = shuffle(deskCards);
+  if (hasWoodMan) {
+    if (hasFirstCard(result.slice(0, 8))) return splitCards(players);
+    const users = players.filter((p) => !isWoodMan(p));
+    return [
+      new GamePlayer(WoodmanPlayer, result.slice(0, 8)),
+      new GamePlayer(users[0], result.slice(8, 31)),
+      new GamePlayer(users[1], result.slice(31, 54)),
+    ];
+  } else {
+    return [
+      new GamePlayer(players[0], result.slice(0, 18)),
+      new GamePlayer(players[1], result.slice(18, 36)),
+      new GamePlayer(players[2], result.slice(36, 54)),
+    ];
+  }
 };
 
 export const getCardAssets = (card: Card) => {
@@ -137,3 +144,10 @@ export const getCardAssets = (card: Card) => {
 };
 
 export const firstCard: Card = { color: Color.Diamond, number: 3 };
+/**
+ * 是否是三
+ * @param card 卡片
+ * @returns 是否
+ */
+export const hasFirstCard = (cards: Card[]) =>
+  cards.findIndex((c) => equal(c, firstCard)) !== -1;

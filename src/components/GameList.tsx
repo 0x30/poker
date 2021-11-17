@@ -7,6 +7,7 @@ import Class from "../style/GameItem.module.scss";
 
 import { useDeskDrawer } from "../components/modal/Desk";
 import { GameMenu } from "./GameMenu";
+import { playerNameCode } from "../core/Player";
 
 const AvatarComp = defineComponent({
   props: {
@@ -35,7 +36,7 @@ const AvatarComp = defineComponent({
               isCurrent ? "bg-success" : "bg-neutral-focus"
             } text-neutral-content rounded-full w-10 h-10`}
           >
-            <span>{props.player.nikeName?.slice(0, 1)}</span>
+            <span>{playerNameCode(props.player)}</span>
           </div>
           <span class="absolute left-1/2 top-full transform -translate-x-1/2">
             {props.player.leftCards.length}

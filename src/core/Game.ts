@@ -1,18 +1,10 @@
 import { ref, toRaw, triggerRef } from "vue";
-import { debugCard, equal, firstCard } from "./Card";
+import { debugCard, equal, firstCard, hasFirstCard } from "./Card";
 import { useGames } from "./Games";
-import { Card, Color, Game, Player, Trick } from "./model";
+import { Card, Game, Player, Trick } from "./model";
 import { detect, duel } from "./Referee";
 
 import { askTrick, deal } from "./req";
-
-/**
- * 是否是三
- * @param card 卡片
- * @returns 是否
- */
-const hasDiamond3 = (cards: Card[]) =>
-  cards.findIndex((c) => equal(c, firstCard)) !== -1;
 
 const getGameLastTricks = (game: Game): Trick[] | undefined => {
   return game.tricks
@@ -53,7 +45,7 @@ export const check = (game: Game, trick: Trick) => {
   if (needHandleTrick === undefined) {
     if (trick.cards === undefined) throw new Error("本次无需应答，必须出牌");
 
-    if (game.tricks.length === 0 && hasDiamond3(trick.cards) === false) {
+    if (game.tricks.length === 0 && hasFirstCard(trick.cards) === false) {
       throw new Error(`首轮出牌，必须存在 ${debugCard(firstCard)}`);
     }
   }
@@ -101,7 +93,7 @@ export const isGameFinish = (game: Game) => game.championer !== undefined;
 export const getGameCurrentPlayer = (game: Game) => {
   // 当前没有回合.默认获取 黑桃三 的拥有者作为当前用户
   if (game.tricks.length === 0) {
-    return game.players.find((p) => hasDiamond3(p.cards))!;
+    return game.players.find((p) => hasFirstCard(p.cards))!;
   }
   if (getNeedHandleTrick(game) === undefined) {
     const pid = getGameLastTricks(game)?.slice(2, 3)[0].player.id;

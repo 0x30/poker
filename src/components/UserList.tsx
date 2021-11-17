@@ -1,6 +1,6 @@
 import { computed, defineComponent, PropType } from "vue";
-import { equal, usePlayers } from "../core/Player";
-import { Player } from "../core/model";
+import { equal, playerNameCode, usePlayers } from "../core/Player";
+import { isNpc, isRobot, isWoodMan, Player } from "../core/model";
 import { useGames } from "../core/Games";
 
 const UserCard = defineComponent({
@@ -37,7 +37,7 @@ const UserCard = defineComponent({
               </div>
               <div class="avatar placeholder">
                 <div class="bg-neutral-focus text-neutral-content rounded-full w-10 h-10">
-                  <span>{props.player.nikeName?.slice(0, 1)}</span>
+                  <span>{playerNameCode(props.player)}</span>
                 </div>
               </div>
               <div class="flex flex-col items-center">
@@ -68,9 +68,11 @@ export default defineComponent({
     return () => {
       return (
         <div class="grid grid-rows-1 grid-cols-1 lg:grid-cols-2 xl:grid-cols-6 gap-3">
-          {players.value.map((p) => (
-            <UserCard player={p} />
-          ))}
+          {players.value
+            .filter((p) => !isNpc(p))
+            .map((p) => (
+              <UserCard player={p} />
+            ))}
         </div>
       );
     };
