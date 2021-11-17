@@ -16,6 +16,7 @@ import {
   useGame,
 } from "../../core/Game";
 import { Card, Game } from "../../core/model";
+import { playerNameCode } from "../../core/Player";
 import { gameTips } from "../../core/Tips";
 import { useMountComponentAndAnimed } from "../../core/useMountComponentAndAnimed";
 import { GameMenu } from "../GameMenu";
@@ -315,8 +316,29 @@ const DeskPlayer = defineComponent({
       /// 如果是第三个试图的话，出牌和控制器 颠倒顺序
       const flexdri = props.index === 2 ? "flex-col-reverse" : "flex-col";
 
+      const avatar = () => {
+        let avatarCss = "";
+        if (props.index === 0) avatarCss = "top-20 left-16";
+        else if (props.index === 1) avatarCss = "top-20 right-16";
+        else avatarCss = "bottom-20 left-16";
+
+        return (
+          <div
+            class={`absolute transform ${avatarCss} flex flex-col items-center space-y-2 tooltip`}
+            data-tip={player.value.nikeName}
+          >
+            <div class="avatar placeholder">
+              <div class="bg-neutral-focus text-neutral-content rounded-full w-16 h-16">
+                <span>{playerNameCode(player.value)}</span>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
       return (
-        <div class={`flex items-center justify-center ${flexdri}`}>
+        <div class={`flex items-center relative justify-center ${flexdri}`}>
+          {avatar()}
           <div class={`space-x-2 h-1/3 flex items-center`}>{btns()}</div>
           <div class="h-1/3 flex items-center">
             <CardGroup
