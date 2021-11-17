@@ -46,6 +46,16 @@ export default defineComponent(() => {
             <i class="gg-games"></i>
           </button>
         </div>
+        <div>
+          <a
+            href="/rule.html"
+            target="_blank"
+            data-tip="规则说明"
+            class="tooltip btn btn-square btn-ghost flex items-center"
+          >
+            <i class="gg-info"></i>
+          </a>
+        </div>
       </div>
     );
   };
