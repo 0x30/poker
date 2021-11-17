@@ -381,12 +381,6 @@ const Desk = defineComponent({
             class="absolute top-0 right-0 bottom-0 w-3/4 flex"
             style="background-color: #45a173;"
           >
-            <button
-              class="btn btn-circle btn absolute right-3 top-3"
-              onClick={() => (isShowDetail.value = !isShowDetail.value)}
-            >
-              <i class="gg-menu-boxed"></i>
-            </button>
             {isShowDetail.value ? <TrickList game={gameRef.value} /> : null}
             <div class="grid grid-cols-2 grid-rows-2 flex-1">
               {gameRef.value.players.map((p, i) => (
@@ -407,6 +401,12 @@ const Desk = defineComponent({
               onToggle={toggle}
               onNext={moveCursor}
             />
+            <button
+              class="btn btn-circle btn absolute right-3 top-3"
+              onClick={() => (isShowDetail.value = !isShowDetail.value)}
+            >
+              <i class="gg-menu-boxed"></i>
+            </button>
           </div>
         </div>
       );
