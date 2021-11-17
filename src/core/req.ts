@@ -76,7 +76,7 @@ export const broadcast = (game: Game, trick: Trick) => {
       .map((p) =>
         cfetch(p, "/broadcast", {
           gameId: game.id,
-          trick,
+          trick: { ...trick, ...{ cards: trick.cards?.map(EncodeCard) } },
         })
       )
   );
