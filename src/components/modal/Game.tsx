@@ -60,14 +60,14 @@ const SelectPlayer = defineComponent({
     const { players } = usePlayers();
 
     /// 重复对战次数
-    const repeatCountRef = ref("1");
+    const repeatCountRef = ref<string>();
     const repeatCountValue = computed(() => {
-      const result = Number.parseInt(repeatCountRef.value);
+      const result = Number.parseInt(repeatCountRef.value ?? "1");
       const count = Number.isNaN(result) ? 1 : result;
       return Math.max(1, count);
     });
 
-    const autoStartRef = ref(true);
+    const autoStartRef = ref(false);
 
     const selectPlayers = ref<Player[]>([]);
     const isSelected = (player: Player) => {
@@ -121,7 +121,8 @@ const SelectPlayer = defineComponent({
                 <input
                   type="number"
                   v-model={repeatCountRef.value}
-                  placeholder="默认1一次，请尽可能的不要超过10次"
+                  max={10}
+                  placeholder="默认一次，请尽可能的不要超过5次"
                   class="input input-bordered font-mono"
                 />
               </div>

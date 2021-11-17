@@ -28,22 +28,21 @@ export default defineComponent(() => {
         <div class="flex-1 px-2 mx-2">
           <span class="text-lg font-bold">跑得快</span>
         </div>
-        <div class="flex-none">
-          <div class="form-control">
-            <input
-              type="text"
-              placeholder="请输入要搜索的东西"
-              class="input input-ghost"
-            />
-          </div>
-        </div>
-        <div class="flex-none">
-          <button class="btn btn-square btn-ghost" onClick={clickAddPlayer}>
+        <div>
+          <button
+            data-tip="增加用户"
+            class="btn btn-square btn-ghost tooltip  flex items-center"
+            onClick={clickAddPlayer}
+          >
             <i class="gg-user-add"></i>
           </button>
         </div>
-        <div class="flex-none">
-          <button class="btn btn-square btn-ghost" onClick={clickAddGame}>
+        <div>
+          <button
+            data-tip="开局游戏"
+            class="tooltip btn btn-square btn-ghost flex items-center"
+            onClick={clickAddGame}
+          >
             <i class="gg-games"></i>
           </button>
         </div>

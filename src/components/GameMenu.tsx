@@ -1,4 +1,4 @@
-import { defineComponent, PropType, ref } from "vue";
+import { defineComponent, PropType } from "vue";
 
 export const GameMenu = defineComponent({
   props: {
@@ -16,7 +16,12 @@ export const GameMenu = defineComponent({
         <div class="btn-group">
           {props.isFinish === false && props.onToggle ? (
             <button
-              class={`btn btn-outline btn-sm ${
+              data-tip={
+                props.isPlaying
+                  ? "自动模式，点击切换为手动"
+                  : "手动模式，点击切换为自动"
+              }
+              class={`btn tooltip btn-outline btn-sm ${
                 props.isPlaying ? "btn-active" : ""
               }`}
               onClick={props.onToggle}
@@ -30,7 +35,11 @@ export const GameMenu = defineComponent({
           ) : null}
 
           {props.onGoDetail && (props.isPlaying === false || props.isFinish) ? (
-            <button class="btn btn-outline btn-sm" onClick={props.onGoDetail}>
+            <button
+              data-tip="查看详情"
+              class="tooltip btn btn-outline btn-sm"
+              onClick={props.onGoDetail}
+            >
               <i class="gg-eye transform "></i>
             </button>
           ) : null}
@@ -39,7 +48,8 @@ export const GameMenu = defineComponent({
           props.onNext === undefined ? null : (
             <>
               <button
-                class={`btn btn-outline btn-sm px-5 ${
+                data-tip="当前用户执行出牌逻辑"
+                class={`btn btn-outline btn-sm tooltip px-5 ${
                   props.isAsking ? "loading" : ""
                 }`}
                 onClick={props.onNext}

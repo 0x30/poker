@@ -32,7 +32,7 @@ const User = defineComponent({
               <input
                 type="text"
                 v-model={ipRef.value}
-                placeholder="输入接口访问地址 例:192.168.0.1"
+                placeholder="输入接口访问地址 例:192.168.0.1:8080"
                 class="input input-bordered font-mono"
               />
             </div>

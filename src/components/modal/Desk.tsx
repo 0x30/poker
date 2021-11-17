@@ -282,28 +282,32 @@ const DeskPlayer = defineComponent({
           return (
             <>
               <button
-                class="btn btn-sm"
+                data-tip="替换原有用户逻辑出牌"
+                class="btn btn-sm tooltip"
                 disabled={selectIdxRef.value.size === 0}
                 onClick={manual}
               >
                 手动出牌
               </button>
               <button
-                class="btn btn-sm"
+                data-tip="不出牌。必须出牌时按钮不可用"
+                class="btn btn-sm tooltip"
                 disabled={!isCanSkip.value}
                 onClick={() => manualPlay(player.value)}
               >
                 过
               </button>
               <button
-                class="btn btn-sm"
+                data-tip="提示当前可以出的卡组，多次点击可切换提示。如此时无可用牌，按钮不可用"
+                class="btn btn-sm tooltip"
                 disabled={!isCanTip.value}
                 onClick={tip}
               >
                 提示
               </button>
               <button
-                class={`btn btn-sm ${isAsking.value ? "loading" : ""}`}
+                data-tip="按照用户有逻辑出牌"
+                class={`btn btn-sm tooltip ${isAsking.value ? "loading" : ""}`}
                 onClick={moveCursor}
               >
                 自动出牌
@@ -402,7 +406,7 @@ const Desk = defineComponent({
               onNext={moveCursor}
             />
             <button
-              class="btn btn-circle btn absolute right-3 top-3"
+              class="btn btn-circle btn absolute right-3 top-10"
               onClick={() => (isShowDetail.value = !isShowDetail.value)}
             >
               <i class="gg-menu-boxed"></i>
