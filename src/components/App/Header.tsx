@@ -48,7 +48,7 @@ export default defineComponent(() => {
         </div>
         <div>
           <a
-            href="/rule.html"
+            href="./rule.html"
             target="_blank"
             data-tip="规则说明"
             class="tooltip btn btn-square btn-ghost flex items-center"
