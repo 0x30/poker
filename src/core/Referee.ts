@@ -201,20 +201,22 @@ export const duelNumbers = (
     return true;
   }
 
-  if (currIsLast === false) {
-    if (prev.length !== curr.length) return undefined;
-  } else {
-    /// 最后一手 为 三条或三条一 ，之比较分支
-    if (
-      (currRes.type === CardsType.santiao ||
-        currRes.type === CardsType.sandaiyi) &&
-      (prevRes.type === CardsType.santiao ||
-        prevRes.type === CardsType.sandaier)
-    ) {
-      return currRes.weight > prevRes.weight;
-    }
-    if (prev.length !== curr.length) return undefined;
-  }
+  // if (currIsLast === false) {
+  //   if (prev.length !== curr.length) return undefined;
+  // } else {
+  //   /// 最后一手 为 三条或三条一 ，之比较分支
+  //   if (
+  //     (currRes.type === CardsType.santiao ||
+  //       currRes.type === CardsType.sandaiyi) &&
+  //     (prevRes.type === CardsType.santiao ||
+  //       prevRes.type === CardsType.sandaier)
+  //   ) {
+  //     return currRes.weight > prevRes.weight;
+  //   }
+  //   if (prev.length !== curr.length) return undefined;
+  // }
+
+  if (prev.length !== curr.length) return undefined;
 
   if (currRes.type === prevRes.type) {
     return currRes.weight > prevRes.weight;
