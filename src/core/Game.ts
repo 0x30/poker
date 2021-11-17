@@ -179,7 +179,7 @@ const __useGame = (g: Game) => {
       triggerRef(gameRef);
       updateGame(game);
     } catch (error) {
-      alert(error);
+      console.error(error);
       throw error;
     }
   };
