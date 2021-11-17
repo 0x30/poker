@@ -1,4 +1,4 @@
-import { EncodeCard } from "./Card";
+import { DecodeCard, EncodeCard } from "./Card";
 import { getGameCurrentPlayer, getNeedHandleTrick } from "./Game";
 import { Game, isNpc, isRobot, isWoodMan, Player, Trick } from "./model";
 import { gameTip } from "./Tips";
@@ -66,7 +66,7 @@ export const askTrick = (game: Game) => {
     needHandleTrick: needTrick(),
   })
     .then((res) => res.json())
-    .then((res) => new Trick(player, res.data));
+    .then((res) => new Trick(player, res.data?.map(DecodeCard)));
 };
 
 export const broadcast = (game: Game, trick: Trick) => {
