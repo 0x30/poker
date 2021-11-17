@@ -12,7 +12,7 @@ export interface Player {
   id: string;
   /// 游戏的昵称
   nikeName: string;
-  /// 访问的 host.就是你的服务器完整地址。比如 http://172.16.41.74:8000
+  /// 访问的 host.就是你的服务器完整地址。比如 172.16.41.74:8000
   host: string;
   /// 这个玩家的创建时间
   createTime: number;
@@ -44,7 +44,7 @@ export interface AskRequest {
   history: Trick[];
   /// 提示卡组 如果无则没有提示卡牌。这是 平台JS 根据你当前的牌组，帮你找到的最小的可以刚好压上对手的卡组，如果没有。则表示你没有牌出，除非我算错了
   tips?: Card[];
-  /// 上一架的出得牌，你需要压上的卡组
+  /// 上一家的出得牌，你需要压上的卡组
   needHandleTrick: Trick;
   /// 一个服务器是可以被添加多个用户的，用户ID可以区分
   userId: string;
