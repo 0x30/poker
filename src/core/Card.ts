@@ -14,8 +14,8 @@ const allColors = [Color.Club, Color.Diamond, Color.Heart, Color.Spade];
 
 // 大小王
 const jokers: Card[] = [
-  { color: 1, number: 17 },
-  { color: 2, number: 18 },
+  { color: Color.Spade, number: 17 },
+  { color: Color.Heart, number: 18 },
 ];
 
 const colorsMap = {
@@ -39,8 +39,50 @@ const numberMap = {
   13: "K",
   14: "A",
   15: "2",
-  17: "小王",
-  18: "大王",
+  17: "JOKER",
+  18: "JOKER",
+};
+
+const deColorsMap = {
+  黑桃: Color.Spade,
+  红桃: Color.Heart,
+  方片: Color.Diamond,
+  梅花: Color.Club,
+};
+
+const deNumberMap = {
+  "3": 3,
+  "4": 4,
+  "5": 5,
+  "6": 6,
+  "7": 7,
+  "8": 8,
+  "9": 9,
+  "10": 10,
+  J: 11,
+  Q: 12,
+  K: 13,
+  A: 14,
+  "2": 15,
+  JOKER: 17,
+};
+
+export const EncodeCard = (card: Card): { number: string; color: string } => {
+  return {
+    number: (numberMap as any)[card.number],
+    color: colorsMap[card.color],
+  };
+};
+
+export const DecodeCard = (card: { number: string; color: string }): Card => {
+  if (card.number === "JOKER" && card.color === "黑桃")
+    return { number: 17, color: Color.Spade };
+  if (card.number === "JOKER" && card.color === "红桃")
+    return { number: 18, color: Color.Heart };
+  return {
+    number: (deNumberMap as any)[card.number],
+    color: (deColorsMap as any)[card.color],
+  };
 };
 
 export const debugCard = (cards: Card) => {

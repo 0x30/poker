@@ -4,7 +4,7 @@ import { useGames } from "./Games";
 import { Card, Game, Player, Trick } from "./model";
 import { detect, duel } from "./Referee";
 
-import { askTrick, deal } from "./req";
+import { askTrick, broadcast, deal } from "./req";
 
 const getGameLastTricks = (game: Game): Trick[] | undefined => {
   return game.tricks
@@ -166,15 +166,22 @@ const __useGame = (g: Game) => {
   const handleTrick = (trick: Trick) => {
     const game = toRaw(gameRef.value);
     const needHandleTrick = getNeedHandleTrick(game);
-    const t = check(game, trick);
-    if (needHandleTrick === undefined) {
-      game.tricks.push({ idx: game.tricks.length, tricks: [t] });
-    } else getGameLastTricks(game)?.push(trick);
-
-    if (checkGameFinish(game, trick.player)) game.championer = trick.player;
-    gameRef.value = game;
-    triggerRef(gameRef);
-    updateGame(game);
+    try {
+      const t = check(game, trick);
+      if (needHandleTrick === undefined) {
+        game.tricks.push({ idx: game.tricks.length, tricks: [t] });
+      } else getGameLastTricks(game)?.push(trick);
+      broadcast(game, t);
+      if (checkGameFinish(game, trick.player)) {
+        game.championer = trick.player;
+      }
+      gameRef.value = game;
+      triggerRef(gameRef);
+      updateGame(game);
+    } catch (error) {
+      alert(error);
+      throw error;
+    }
   };
 
   start();

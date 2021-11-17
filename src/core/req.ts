@@ -1,3 +1,4 @@
+import { EncodeCard } from "./Card";
 import { getGameCurrentPlayer, getNeedHandleTrick } from "./Game";
 import { Game, isNpc, isRobot, isWoodMan, Player, Trick } from "./model";
 import { gameTip } from "./Tips";
@@ -15,24 +16,7 @@ const cfetch = (player: Player, path: string, body: any) => {
           headers: { "content-type": "application/json" },
           method: "POST",
         };
-  return fetch(url(player, path), { ...params }).then((res) => res.json());
-};
-
-/**
- * 是否准备好
- */
-export const ready = async (game: Game) => {
-  const req = (p: Player) => {
-    return new Promise<boolean>((resolve) => {
-      cfetch(p, "/ready", undefined)
-        .then((res) => resolve(res.data))
-        .catch(() => resolve(false));
-    });
-  };
-  const res = await Promise.all(
-    game.players.filter((p) => isNpc(p) === false).map(req)
-  );
-  return res.every((v) => v);
+  return fetch(url(player, path), { ...params, ...{ mode: "cors" } });
 };
 
 /**
@@ -42,7 +26,12 @@ export const deal = (game: Game) => {
   return Promise.all(
     game.players
       .filter((p) => isNpc(p) === false)
-      .map((p) => cfetch(p, "/deal", { gameId: game.id, cards: p.cards }))
+      .map((p) =>
+        cfetch(p, "/deal", {
+          gameId: game.id,
+          cards: p.cards.map(EncodeCard),
+        })
+      )
   );
 };
 
@@ -50,12 +39,34 @@ export const askTrick = (game: Game) => {
   const player = getGameCurrentPlayer(game);
   if (isWoodMan(player)) return Promise.resolve(new Trick(player, undefined));
   if (isRobot(player)) return Promise.resolve(new Trick(player, gameTip(game)));
+
+  const history = () => {
+    const result = game.tricks
+      .slice(-1)
+      .sort((a, b) => b.idx - a.idx)
+      .flatMap((ts) => ts.tricks.sort((a, b) => b.createTime - a.createTime));
+    return result.map((t) => ({
+      ...t,
+      ...{ cards: t.cards?.map(EncodeCard) },
+    }));
+  };
+
+  const needTrick = () => {
+    const trick = getNeedHandleTrick(game);
+    return {
+      ...trick,
+      ...{ cards: trick?.cards?.map(EncodeCard) },
+    };
+  };
+
   return cfetch(player, "/ask", {
     gameId: game.id,
-    trciks: game.tricks,
-    tips: gameTip(game),
-    needHandleTrick: getNeedHandleTrick(game),
-  }).then((res) => new Trick(player, res.data));
+    history: history(),
+    tips: gameTip(game)?.map((c) => EncodeCard(c)),
+    needHandleTrick: needTrick(),
+  })
+    .then((res) => res.json())
+    .then((res) => new Trick(player, res.data));
 };
 
 export const broadcast = (game: Game, trick: Trick) => {
