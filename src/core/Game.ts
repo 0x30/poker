@@ -179,9 +179,7 @@ const __useGame = (g: Game) => {
   };
 
   const cancelTrick = () => {
-    gameRef.value.tricks = gameRef.value.tricks
-      .sort((a, b) => b.idx - a.idx)
-      .slice(0, -1);
+    getGameLastTricks(gameRef.value)?.shift();
     triggerRef(gameRef);
     updateGame(gameRef.value);
   };
@@ -189,12 +187,17 @@ const __useGame = (g: Game) => {
   const moveCursor = async () => {
     const game = toRaw(gameRef.value);
     if (game.championer !== undefined) return;
-    isAsking.value = true;
+
     // 获取下一个人的出牌
-    const trick = await askTrick(game);
-    isAsking.value = false;
-    handleTrick(trick);
-    if (gameRef.value.autoStart === true) moveCursor();
+    try {
+      isAsking.value = true;
+      const trick = await askTrick(game);
+      isAsking.value = false;
+      handleTrick(trick);
+      if (gameRef.value.autoStart === true) moveCursor();
+    } catch (error) {
+      isAsking.value = false;
+    }
   };
 
   const handleTrick = (trick: Trick) => {
