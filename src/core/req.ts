@@ -43,8 +43,8 @@ export const askTrick = (game: Game) => {
   const history = () => {
     const result = game.tricks
       .slice(-1)
-      .sort((a, b) => b.idx - a.idx)
-      .flatMap((ts) => ts.tricks.sort((a, b) => b.createTime - a.createTime));
+      .sort((a, b) => a.idx - b.idx)
+      .flatMap((ts) => ts.tricks.sort((a, b) => a.createTime - b.createTime));
     return result.map((t) => ({
       ...t,
       ...{ cards: t.cards?.map(EncodeCard) },
