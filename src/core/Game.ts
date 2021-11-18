@@ -152,6 +152,20 @@ const __useGame = (g: Game) => {
     handleTrick(trick);
   };
 
+  const trashTricks = () => {
+    gameRef.value.tricks = [];
+    triggerRef(gameRef);
+    updateGame(gameRef.value);
+  };
+
+  const cancelTrick = () => {
+    gameRef.value.tricks = gameRef.value.tricks
+      .sort((a, b) => b.idx - a.idx)
+      .slice(0, -1);
+    triggerRef(gameRef);
+    updateGame(gameRef.value);
+  };
+
   const moveCursor = async () => {
     const game = toRaw(gameRef.value);
     if (game.championer !== undefined) return;
@@ -186,6 +200,8 @@ const __useGame = (g: Game) => {
 
   start();
   return {
+    trashTricks,
+    cancelTrick,
     isAsking,
     gameRef,
     toggle,

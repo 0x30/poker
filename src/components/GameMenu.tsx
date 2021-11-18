@@ -5,6 +5,10 @@ export const GameMenu = defineComponent({
     isAsking: Boolean,
     isPlaying: Boolean,
     isFinish: Boolean,
+    isCanCancel: Boolean,
+    isTrash: Boolean,
+    onTrash: Function as PropType<() => void>,
+    onCancel: Function as PropType<() => void>,
     onClose: Function as PropType<() => void>,
     onToggle: Function as PropType<() => void>,
     onGoDetail: Function as PropType<() => void>,
@@ -12,8 +16,53 @@ export const GameMenu = defineComponent({
   },
   setup: (props) => {
     return () => {
+      const btns = () => {
+        if (
+          props.isFinish === false &&
+          props.isPlaying === false &&
+          props.isAsking === false
+        ) {
+          const res = [];
+          if (props.onTrash) {
+            res.push(
+              <button
+                disabled={props.isCanCancel === false}
+                data-tip="移除全部操作"
+                class="tooltip btn btn-outline btn-sm"
+                onClick={props.onTrash}
+              >
+                <i class="gg-trash-empty"></i>
+              </button>
+            );
+          }
+
+          if (props.onCancel) {
+            res.push(
+              <button
+                disabled={props.isCanCancel === false}
+                data-tip="撤销一步操作"
+                class="tooltip btn btn-outline btn-sm"
+                onClick={props.onCancel}
+              >
+                <i class="gg-corner-up-left"></i>
+              </button>
+            );
+          }
+
+          return res;
+        }
+      };
+
       return (
         <div class="btn-group">
+          {btns()}
+          <button
+            data-tip="查看详情"
+            class="tooltip btn btn-outline btn-sm"
+            onClick={props.onGoDetail}
+          >
+            <i class="gg-eye transform "></i>
+          </button>
           {props.isFinish === false && props.onToggle ? (
             <button
               data-tip={

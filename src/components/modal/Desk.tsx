@@ -372,11 +372,11 @@ const Desk = defineComponent({
   setup: (props) => {
     const isShowDetail = ref(false);
 
-    const { gameRef, moveCursor, toggle, isAsking } = useGame(
-      unref(props.game)
-    );
+    const { gameRef, moveCursor, toggle, isAsking, trashTricks, cancelTrick } =
+      useGame(unref(props.game));
     /// 游戏是否完毕
     const isFinish = computed(() => gameRef.value.championer !== undefined);
+    const isCanCancel = computed(() => gameRef.value.tricks.length > 0);
 
     return () => {
       return (
@@ -397,6 +397,9 @@ const Desk = defineComponent({
               ))}
             </div>
             <GameMenu
+              isCanCancel={isCanCancel.value}
+              onCancel={cancelTrick}
+              onTrash={trashTricks}
               onClose={props.onClose}
               isAsking={isAsking.value}
               class="absolute bottom-4 right-2"
