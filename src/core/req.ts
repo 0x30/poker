@@ -25,6 +25,7 @@ const cfetch = (player: Player, path: string, body: any) => {
 export const deal = (game: Game) => {
   return Promise.all(
     game.players
+      .map((p) => ({ ...p, ...{ leftCards: undefined } }))
       .filter((p) => isNpc(p) === false)
       .map((p) =>
         cfetch(p, "/deal", {
@@ -42,11 +43,11 @@ export const askTrick = (game: Game) => {
 
   const history = () => {
     const result = game.tricks
-      .slice(-1)
       .sort((a, b) => a.idx - b.idx)
       .flatMap((ts) => ts.tricks.sort((a, b) => a.createTime - b.createTime));
     return result.map((t) => ({
       ...t,
+      ...{ player: { ...t.player, ...{ leftCards: undefined } } },
       ...{ cards: t.cards?.map(EncodeCard) },
     }));
   };
@@ -72,6 +73,7 @@ export const askTrick = (game: Game) => {
 export const broadcast = (game: Game, trick: Trick) => {
   return Promise.all(
     game.players
+      .map((p) => ({ ...p, ...{ leftCards: undefined } }))
       .filter((p) => isNpc(p) === false)
       .map((p) =>
         cfetch(p, "/broadcast", {
