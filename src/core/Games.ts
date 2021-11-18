@@ -1,6 +1,6 @@
 import localforage from "localforage";
-import { ref, triggerRef } from "vue";
-import { Player, Game } from "./model";
+import { ref } from "vue";
+import { Game } from "./model";
 import Queue from "p-queue";
 
 const db = localforage.createInstance({

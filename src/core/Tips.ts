@@ -1,4 +1,4 @@
-import { debugCards, jokers } from "./Card";
+import { jokers } from "./Card";
 import {
   getCurrentCardsPool,
   getGameCurrentPlayer,

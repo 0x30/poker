@@ -1,7 +1,7 @@
 import { computed, defineComponent, PropType } from "@vue/runtime-core";
 import { ref } from "vue";
 import { playerName, playerNameCode, usePlayers } from "../../core/Player";
-import { Game, GamePlayer, Player } from "../../core/model";
+import { Game, Player } from "../../core/model";
 import { splitCards } from "../../core/Card";
 import { useMountComponentAndAnimed } from "../../core/useMountComponentAndAnimed";
 import { getPermutations } from "../../core/util";

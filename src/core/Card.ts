@@ -1,5 +1,4 @@
-// https://github.com/selfthinker/CSS-Playing-Cards
-import { shuffle, chunk } from "lodash";
+import { shuffle } from "lodash";
 import {
   Card,
   Color,

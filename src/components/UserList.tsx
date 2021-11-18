@@ -1,6 +1,6 @@
 import { computed, defineComponent, PropType } from "vue";
 import { equal, playerNameCode, usePlayers } from "../core/Player";
-import { isNpc, isRobot, isWoodMan, Player } from "../core/model";
+import { isNpc, Player } from "../core/model";
 import { useGames } from "../core/Games";
 
 const UserCard = defineComponent({
