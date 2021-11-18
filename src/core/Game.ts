@@ -1,5 +1,5 @@
 import { ref, toRaw, triggerRef } from "vue";
-import { debugCard, equal, firstCard, hasFirstCard } from "./Card";
+import { debugCard, debugCards, equal, firstCard, hasFirstCard } from "./Card";
 import { useGames } from "./Games";
 import { Card, Game, Player, Trick } from "./model";
 import { detect, duel } from "./Referee";
@@ -43,17 +43,33 @@ export const check = (game: Game, trick: Trick) => {
   const needHandleTrick = getNeedHandleTrick(game);
   /// 不需要进行处理排除
   if (needHandleTrick === undefined) {
-    if (trick.cards === undefined) throw new Error("本次无需应答，必须出牌");
+    if (trick.cards === undefined) {
+      const error = `
+流程错误
+本次轮到你出牌，必须出的那种
+      `;
+      throw new Error(error);
+    }
 
     if (game.tricks.length === 0 && hasFirstCard(trick.cards) === false) {
-      throw new Error(`首轮出牌，必须存在 ${debugCard(firstCard)}`);
+      const error = `
+牌型错误
+首次出牌 卡组中，必须包含 ${debugCard(firstCard)}
+      `;
+      throw new Error(error);
     }
   }
 
   /// pass
   if (trick.cards === undefined) return trick;
   /// 牌型判断
-  if (detect(trick.cards) === undefined) throw new Error("牌型有问题");
+  if (detect(trick.cards) === undefined) {
+    const error = `
+牌型有问题:
+尝试出牌 [${debugCards(trick.cards)}]
+    `;
+    throw new Error(error);
+  }
 
   /// 确认 出得牌 是否都在当前牌库内
   const currentCardPolls = getCurrentCardsPool(game, trick.player);
@@ -62,7 +78,12 @@ export const check = (game: Game, trick: Trick) => {
       (c) => currentCardPolls.find((cc) => equal(cc, c)) !== undefined
     ) === false
   ) {
-    throw new Error("卡牌不全，请检查");
+    const error = `
+卡牌不全，请检查:
+当前卡池 ${debugCards(currentCardPolls)}
+尝试出牌 ${debugCards(trick.cards)}
+    `;
+    throw new Error(error);
   }
   if (needHandleTrick?.cards === undefined) return trick;
   if (
@@ -74,7 +95,12 @@ export const check = (game: Game, trick: Trick) => {
   ) {
     return trick;
   }
-  throw new Error("牌型有问题，打不过");
+  const error = `
+出得牌不符合规则
+对手出牌 ${debugCards(needHandleTrick.cards)}
+尝试出牌 ${debugCards(trick.cards)}
+  `;
+  throw new Error(error);
 };
 
 /**
