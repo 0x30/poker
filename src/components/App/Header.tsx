@@ -31,7 +31,7 @@ export default defineComponent(() => {
         <div>
           <button
             data-tip="增加用户"
-            class="btn btn-square btn-ghost tooltip  flex items-center"
+            class="btn btn-square btn-ghost tooltip flex items-center"
             onClick={clickAddPlayer}
           >
             <i class="gg-user-add"></i>

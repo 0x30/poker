@@ -6,6 +6,7 @@ import {
   PropType,
   ref,
   unref,
+  watchEffect,
 } from "@vue/runtime-core";
 import { computed } from "vue";
 import { debugCard, equal, getCardAssets } from "../../core/Card";
@@ -15,7 +16,7 @@ import {
   getNeedHandleTrick,
   useGame,
 } from "../../core/Game";
-import { Card, Game } from "../../core/model";
+import { Card, Game, isWoodMan } from "../../core/model";
 import { playerNameCode } from "../../core/Player";
 import { gameTips } from "../../core/Tips";
 import { useMountComponentAndAnimed } from "../../core/useMountComponentAndAnimed";
@@ -205,6 +206,11 @@ const DeskPlayer = defineComponent({
         getGameCurrentPlayer(gameRef.value).id === player.value.id;
       if (isCurrent === false) selectIdxRef.value.clear();
       return isCurrent;
+    });
+
+    watchEffect(() => {
+      if (isCurrentPlayer.value === true && isWoodMan(player.value))
+        manualPlay(player.value);
     });
 
     const onSelectIdxs = (idxs: number[]) => {
