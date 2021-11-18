@@ -171,7 +171,7 @@ export const detectTypeNumbers = (numbers: number[]): Result | undefined => {
   }
 
   if (numbers.length >= 5) {
-    if (monotone(numbers)) {
+    if (Math.max(...numbers) < 15 && monotone(numbers)) {
       return { type: CardsType.danshun, weight: Math.max(...numbers) };
     }
     if (isShun(numbers, 3)) {
