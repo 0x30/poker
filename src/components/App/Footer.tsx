@@ -1,5 +1,7 @@
 import { defineComponent } from "@vue/runtime-core";
 
+declare var __poker__app__version: number;
+
 export default defineComponent(() => {
   return () => {
     return (
@@ -22,3 +24,5 @@ export default defineComponent(() => {
     );
   };
 });
+
+console.log(__poker__app__version);
