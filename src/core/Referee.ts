@@ -74,7 +74,7 @@ const count = (numbers: number[]) => {
  * count: 1
  * }]
  */
-const countArray = (numbers: number[]) => {
+export const countArray = (numbers: number[]) => {
   const res = count(numbers);
   return nkeys(res).map((k) => ({ number: k, count: res[k] }));
 };
@@ -87,7 +87,7 @@ const nkeys = (o: {}) => Object.keys(o).map((i) => Number.parseInt(i));
 /**
  * 检查给定的数组是否连续自增+1的，比如 1,2,3
  */
-const monotone = (numers: number[]) => {
+export const monotone = (numers: number[]) => {
   return numers
     .sort((a, b) => a - b)
     .every((n, i, nums) => n === (nums[i - 1] ?? nums[0] - 1) + 1);
@@ -104,6 +104,10 @@ const isfeiji = (numbers: number[]) => {
   const res = countArray(numbers);
   const r = res.filter((r) => r.count === 3);
   if (r.length >= 2) {
+    /// 没有正确带了翅膀
+    if (r.length * 2 + r.length * 3 !== numbers.length) {
+      return undefined;
+    }
     const ns = r.map((i) => i.number);
     if (monotone(ns)) return Math.max(...ns);
   }
@@ -205,21 +209,6 @@ export const duelNumbers = (
       return currRes.weight > prevRes.weight;
     return true;
   }
-
-  // if (currIsLast === false) {
-  //   if (prev.length !== curr.length) return undefined;
-  // } else {
-  //   /// 最后一手 为 三条或三条一 ，之比较分支
-  //   if (
-  //     (currRes.type === CardsType.santiao ||
-  //       currRes.type === CardsType.sandaiyi) &&
-  //     (prevRes.type === CardsType.santiao ||
-  //       prevRes.type === CardsType.sandaier)
-  //   ) {
-  //     return currRes.weight > prevRes.weight;
-  //   }
-  //   if (prev.length !== curr.length) return undefined;
-  // }
 
   if (prev.length !== curr.length) return undefined;
 

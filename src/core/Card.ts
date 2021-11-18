@@ -13,7 +13,7 @@ import {
 const allColors = [Color.Club, Color.Diamond, Color.Heart, Color.Spade];
 
 // 大小王
-const jokers: Card[] = [
+export const jokers: Card[] = [
   { color: Color.Spade, number: 17 },
   { color: Color.Heart, number: 18 },
 ];
