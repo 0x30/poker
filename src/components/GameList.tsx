@@ -111,6 +111,7 @@ const GameItem = defineComponent({
     },
   },
   setup: (props) => {
+    const { delGame } = useGames();
     const { gameRef, moveCursor, toggle, isAsking } = useGame(
       unref(props.game)
     );
@@ -151,6 +152,7 @@ const GameItem = defineComponent({
             </svg>
           </div>
           <GameMenu
+            onDelGame={() => delGame(gameRef.value)}
             onGoDetail={() => useDeskDrawer(gameRef.value)}
             isAsking={isAsking.value}
             isFinish={isFinish}

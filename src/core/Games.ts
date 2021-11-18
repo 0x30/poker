@@ -26,9 +26,9 @@ export const useGames = () => {
     refreshGames();
   };
 
-  const delGame = async (player: Player) => {
-    await db.removeItem(player.id);
-    delete queues[player.id];
+  const delGame = async (game: Game) => {
+    await db.removeItem(game.id);
+    delete queues[game.id];
     refreshGames();
   };
 

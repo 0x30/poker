@@ -7,6 +7,7 @@ export const GameMenu = defineComponent({
     isFinish: Boolean,
     isCanCancel: Boolean,
     isTrash: Boolean,
+    onDelGame: Function as PropType<() => void>,
     onTrash: Function as PropType<() => void>,
     onCancel: Function as PropType<() => void>,
     onClose: Function as PropType<() => void>,
@@ -17,12 +18,25 @@ export const GameMenu = defineComponent({
   setup: (props) => {
     return () => {
       const btns = () => {
+        const res = [];
+
+        if (props.isAsking === false && props.onDelGame) {
+          res.push(
+            <button
+              data-tip="删除游戏"
+              class="tooltip btn btn-outline btn-sm px-5"
+              onClick={props.onDelGame}
+            >
+              <i class="gg-trash"></i>
+            </button>
+          );
+        }
+
         if (
           props.isFinish === false &&
           props.isPlaying === false &&
           props.isAsking === false
         ) {
-          const res = [];
           if (props.onTrash) {
             res.push(
               <button
@@ -31,7 +45,7 @@ export const GameMenu = defineComponent({
                 class="tooltip btn btn-outline btn-sm"
                 onClick={props.onTrash}
               >
-                <i class="gg-trash-empty"></i>
+                <i class="gg-undo"></i>
               </button>
             );
           }
@@ -44,25 +58,17 @@ export const GameMenu = defineComponent({
                 class="tooltip btn btn-outline btn-sm"
                 onClick={props.onCancel}
               >
-                <i class="gg-corner-up-left"></i>
+                <i class="gg-mail-reply"></i>
               </button>
             );
           }
-
-          return res;
         }
+        return res;
       };
 
       return (
         <div class="btn-group">
           {btns()}
-          <button
-            data-tip="查看详情"
-            class="tooltip btn btn-outline btn-sm"
-            onClick={props.onGoDetail}
-          >
-            <i class="gg-eye transform "></i>
-          </button>
           {props.isFinish === false && props.onToggle ? (
             <button
               data-tip={
