@@ -94,7 +94,11 @@ const EmojiCards = {
 };
 
 export const emojiCard = (c: Card) => (EmojiCards[c.color] as any)[c.number];
-export const emojiCards = (cards?: Card[]) => cards?.map(emojiCard).join("");
+export const emojiCards = (cards?: Card[]) =>
+  cards
+    ?.sort((a, b) => b.number - a.number)
+    .map(emojiCard)
+    .join("");
 
 const numberMap = {
   3: "3",
