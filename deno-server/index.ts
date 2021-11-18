@@ -24,6 +24,6 @@ router.post("/broadcast", async (ctx) => {
 });
 
 await new Application()
-  .use(oakCors({ origin: "http://localhost:3000" }))
+  .use(oakCors({ origin: "http://localhost:5000" }))
   .use(router.routes())
   .listen({ port: 8000 });

@@ -46,7 +46,8 @@ const _gameTips = (game: Game): (Result & { cards: Card[] })[] => {
     }
     const cp = getGameCurrentPlayer(game);
     const currentCardPools = getCurrentCardsPool(game, cp);
-    if (needHandleTrick === undefined) return [currentCardPools.slice(0, 1)];
+    if (needHandleTrick === undefined)
+      return [currentCardPools.sort((a, b) => a.number - b.number).slice(0, 1)];
     return tips(needHandleTrick.cards!, currentCardPools);
   };
   return exec().map((cs) => ({ ...detect(cs)!, ...{ cards: cs } }));
