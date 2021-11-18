@@ -254,9 +254,7 @@ const DeskPlayer = defineComponent({
       );
       try {
         manualPlay(player.value, cards);
-      } catch (error) {
-        alert(error);
-      }
+      } catch (error) {}
     };
 
     return () => {

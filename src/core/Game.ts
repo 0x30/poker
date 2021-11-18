@@ -1,5 +1,5 @@
 import { ref, toRaw, triggerRef } from "vue";
-import { debugCard, debugCards, equal, firstCard, hasFirstCard } from "./Card";
+import { debugCard, emojiCards, equal, firstCard, hasFirstCard } from "./Card";
 import { useGames } from "./Games";
 import { Card, Game, Player, Trick } from "./model";
 import { detect, duel } from "./Referee";
@@ -44,19 +44,13 @@ export const check = (game: Game, trick: Trick) => {
   /// 不需要进行处理排除
   if (needHandleTrick === undefined) {
     if (trick.cards === undefined) {
-      const error = `
-流程错误
-本次轮到你出牌，必须出的那种
-      `;
-      throw new Error(error);
+      throw new Error("流程错误,本次必须出牌");
     }
 
     if (game.tricks.length === 0 && hasFirstCard(trick.cards) === false) {
-      const error = `
-牌型错误
-首次出牌 卡组中，必须包含 ${debugCard(firstCard)}
-      `;
-      throw new Error(error);
+      console.log("======================================");
+      console.log(`%c${emojiCards(trick.cards)}`, "font-size: 100px");
+      throw new Error(`牌型错误,首次出牌中必须包含${debugCard(firstCard)}`);
     }
   }
 
@@ -64,11 +58,9 @@ export const check = (game: Game, trick: Trick) => {
   if (trick.cards === undefined) return trick;
   /// 牌型判断
   if (detect(trick.cards) === undefined) {
-    const error = `
-牌型有问题:
-尝试出牌 [${debugCards(trick.cards)}]
-    `;
-    throw new Error(error);
+    console.log("======================================");
+    console.log(`%c${emojiCards(trick.cards)}`, "font-size: 100px");
+    throw new Error("出牌规则错误");
   }
 
   /// 确认 出得牌 是否都在当前牌库内
@@ -78,12 +70,13 @@ export const check = (game: Game, trick: Trick) => {
       (c) => currentCardPolls.find((cc) => equal(cc, c)) !== undefined
     ) === false
   ) {
-    const error = `
-卡牌不全，请检查:
-当前卡池 ${debugCards(currentCardPolls)}
-尝试出牌 ${debugCards(trick.cards)}
-    `;
-    throw new Error(error);
+    console.log("======================================");
+    console.log(
+      `剩余卡池: %c${emojiCards(currentCardPolls)}`,
+      "font-size: 100px"
+    );
+    console.log(`当前卡组: %c${emojiCards(trick.cards)}`, "font-size: 100px");
+    throw new Error("卡牌不全，请检查");
   }
   if (needHandleTrick?.cards === undefined) return trick;
   if (
@@ -95,12 +88,13 @@ export const check = (game: Game, trick: Trick) => {
   ) {
     return trick;
   }
-  const error = `
-出得牌不符合规则
-对手出牌 ${debugCards(needHandleTrick.cards)}
-尝试出牌 ${debugCards(trick.cards)}
-  `;
-  throw new Error(error);
+  console.log("======================================");
+  console.log(
+    `对手卡组: %c${emojiCards(needHandleTrick.cards)}`,
+    "font-size: 100px"
+  );
+  console.log(`当前卡组: %c${emojiCards(trick.cards)}`, "font-size: 100px");
+  throw new Error("出得牌不太对劲，不是打不错，就是类型大太搭");
 };
 
 /**
