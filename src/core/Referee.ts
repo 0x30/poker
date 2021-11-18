@@ -142,9 +142,9 @@ export const detectTypeNumbers = (numbers: number[]): Result | undefined => {
 
   if (numbers.length === 3 && same(numbers)) {
     // 三条A单出不带牌时是最大的炸弹，带牌时则作为普通牌型。
-    if (numbers[0] === 14) {
-      return { type: CardsType.zhadan, weight: numbers[0] };
-    }
+    // if (numbers[0] === 14) {
+    //   return { type: CardsType.zhadan, weight: numbers[0] };
+    // }
     return { type: CardsType.santiao, weight: numbers[0] };
   }
 
