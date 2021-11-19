@@ -20,7 +20,7 @@ export enum CardsType {
   /// 四带二
   sidaier = 11,
   /// 炸弹
-  zhadan = 11,
+  zhadan = 13,
 }
 
 export interface Result {
