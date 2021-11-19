@@ -1,18 +1,34 @@
 import { DecodeCard, EncodeCard } from "./Card";
 import { getGameCurrentPlayer, getNeedHandleTrick } from "./Game";
-import { Game, isNpc, isRobot, isWoodMan, Player, Trick } from "./model";
+import {
+  Game,
+  GamePlayer,
+  isNpc,
+  isRobot,
+  isWoodMan,
+  Player,
+  Trick,
+} from "./model";
 import { gameTip } from "./Tips";
 
 const url = (player: Player, path: string) => {
   return `http://${player.host}${path}`;
 };
 
-const cfetch = (player: Player, path: string, body: any) => {
+const cfetch = (player: GamePlayer, path: string, body: any) => {
   const params =
     body === undefined
       ? undefined
       : {
-          body: JSON.stringify({ ...body, ...{ player } }),
+          body: JSON.stringify({
+            ...body,
+            ...{
+              player: {
+                ...player,
+                ...{ cards: player.cards.map(EncodeCard) },
+              },
+            },
+          }),
           headers: { "content-type": "application/json" },
           method: "POST",
         };

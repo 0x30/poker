@@ -1,13 +1,12 @@
-import { jokers } from "./Card";
 import {
   getCurrentCardsPool,
   getGameCurrentPlayer,
   getNeedHandleTrick,
 } from "./Game";
 import { Card, Color, Game } from "./model";
-import { CardsType, detect, monotone, Result } from "./Referee";
+import { detect, Result } from "./Referee";
+import { tips } from "./Tip";
 import { useCache } from "./util";
-
 
 const _gameTips = (game: Game): (Result & { cards: Card[] })[] => {
   const exec = () => {
