@@ -159,7 +159,9 @@ export const DecodeCard = (card: { number: string; color: string }): Card => {
 export const debugCard = (cards: Card) => {
   const desc = (card: Card) => {
     if (card.number === 17 || card.number === 18)
-      return `${numberMap[card.number]}`;
+      return `${Color.Heart === card.color ? "大" : "小"}${
+        numberMap[card.number]
+      }`;
     return `${colorsMap[card.color]}${(numberMap as any)[card.number]}`;
   };
   return desc(cards);
