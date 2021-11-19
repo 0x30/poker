@@ -30,11 +30,13 @@ export const gameTips = (game: Game) => {
     tricks = game.tricks.length,
     trickss = game.tricks.reduce((t, c) => t + c.tricks.length, 0);
   const id = `${gid}${tricks}${trickss}`;
-  return gameTipCache(id, () => _gameTips(game));
+  return gameTipCache(id, () =>
+    _gameTips(game).sort(
+      (a, b) => a.type * 10 + a.weight - (b.type * 10 + b.weight)
+    )
+  );
 };
 
 export const gameTip = (game: Game): Card[] | undefined => {
-  return gameTips(game).sort(
-    (a, b) => a.type * 10 + a.weight - (b.type * 10 + b.weight)
-  )[0]?.cards;
+  return gameTips(game)[0]?.cards;
 };

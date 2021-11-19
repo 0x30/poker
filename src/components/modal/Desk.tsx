@@ -241,10 +241,12 @@ const DeskPlayer = defineComponent({
       if (isCurrent === false) selectIdxRef.value.clear();
       return isCurrent;
     });
-
+    
+    let tipIndex = 0;
     watchEffect(() => {
       if (isCurrentPlayer.value === true && isWoodMan(player.value))
         manualPlay(player.value);
+      tipIndex = 0;
     });
 
     const onSelectIdxs = (idxs: number[]) => {
@@ -259,9 +261,7 @@ const DeskPlayer = defineComponent({
     );
 
     const isCanTip = computed(() => tipCards.value.length > 0);
-    const tipCards = computed(() =>
-      gameTips(gameRef.value).sort((a, b) => a.weight - b.weight)
-    );
+    const tipCards = computed(() => gameTips(gameRef.value));
 
     /// 当前用户是否是冠军
     const isChampioner = computed(
@@ -271,7 +271,6 @@ const DeskPlayer = defineComponent({
     /// 游戏是否完毕
     const isFinished = computed(() => gameRef.value.championer !== undefined);
 
-    let tipIndex = 0;
     const tip = () => {
       if (tipCards.value.length === 0) return;
       selectIdxRef.value.clear();
