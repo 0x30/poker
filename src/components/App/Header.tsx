@@ -1,18 +1,39 @@
-import { defineComponent } from "@vue/runtime-core";
+import { computed, defineComponent } from "@vue/runtime-core";
 
 import { usePlayers } from "../../core/Player";
 import { useGameAlert } from "../modal/Game";
 
 import { useGames } from "../../core/Games";
 import { usePlayerAlert } from "../modal/Player";
-import { useTrophyAlert } from "../modal/Trophy";
+import { Game, isNpc, WoodmanPlayer } from "../../core/model";
+import { getPermutations } from "../../core/util";
+import { newVersionsplitCards } from "../../core/Card";
 
 export default defineComponent(() => {
-  const { addPlayer } = usePlayers();
+  const { addPlayer, players: ps } = usePlayers();
   const { addGames } = useGames();
 
   const clickAddTrophy = async () => {
-    const games = await useTrophyAlert();
+    const players = computed(() => ps.value.filter((p) => !isNpc(p)));
+
+    // 每组两个人
+    const permutationPlayers = getPermutations(players.value, 2).map((us) => [
+      ...us,
+      ...[WoodmanPlayer],
+    ]);
+    // 按照组 每一组重复对战次数
+    const result = permutationPlayers.flatMap((players) => {
+      const res = new Array(1).fill("").flatMap(() => {
+        return newVersionsplitCards(players);
+      });
+      return res;
+    });
+    const games = result.map((r) => {
+      const game = new Game(r, true);
+      game.__isOnline = true;
+      return game;
+    });
+
     addGames(games);
   };
 

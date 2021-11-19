@@ -2,7 +2,7 @@ import { defineComponent, onMounted, PropType, unref } from "vue";
 import { useGames } from "../core/Games";
 import { useGame } from "../core/Game";
 
-import { Game } from "../core/model";
+import { Game, isWoodMan } from "../core/model";
 
 import { useDeskDrawer } from "../components/modal/Desk";
 import { GameMenuStyle2 as GameMenu } from "./GameMenu";
@@ -33,6 +33,15 @@ const GameItem = defineComponent({
               )}
               <p class="text-base-content text-opacity-40 font-mono">
                 {gameRef.value.id}
+              </p>
+              <p>
+                {gameRef.value.players
+                  .filter((r) => !isWoodMan(r))
+                  .map((r) => r.nikeName)
+                  .join(",")}
+                <span class="text-red-400">
+                  胜利者:{gameRef.value.championer?.nikeName}
+                </span>
               </p>
             </div>
             <div class="flex space-x-2 flex-0">
