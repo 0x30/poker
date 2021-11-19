@@ -63,6 +63,12 @@ export const check = (game: Game, trick: Trick) => {
     throw new Error("出牌规则错误");
   }
 
+  if (new Set(trick.cards.map(debugCard)).size !== trick.cards.length) {
+    console.log("======================================");
+    console.log(`%c${emojiCards(trick.cards)}`, "font-size: 100px");
+    throw new Error("你出得牌不太对劲");
+  }
+
   /// 确认 出得牌 是否都在当前牌库内
   const currentCardPolls = getCurrentCardsPool(game, trick.player);
   if (
