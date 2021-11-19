@@ -47,7 +47,7 @@ export interface AskRequest {
   /// 上一家的出得牌，你需要压上的卡组
   needHandleTrick: Trick;
   /// 一个服务器是可以被添加多个用户的，用户ID可以区分
-  userId: string;
+  player: Player & { cards: Card[] };
 }
 
 export interface AskResponse {
