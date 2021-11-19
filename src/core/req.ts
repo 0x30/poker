@@ -1,14 +1,6 @@
 import { DecodeCard, EncodeCard } from "./Card";
 import { getGameCurrentPlayer, getNeedHandleTrick } from "./Game";
-import {
-  Game,
-  GamePlayer,
-  isNpc,
-  isRobot,
-  isWoodMan,
-  Player,
-  Trick,
-} from "./model";
+import { Game, GamePlayer, isRobot, isWoodMan, Player, Trick } from "./model";
 import { gameTip } from "./Tips";
 
 const url = (player: Player, path: string) => {
@@ -68,7 +60,10 @@ export const askTrick = (game: Game) => {
   return cfetch(player, "/ask", {
     gameId: game.id,
     history: history(),
-    tips: gameTip(game)?.map((c) => EncodeCard(c)),
+    tips:
+      game.__isOnline === true
+        ? undefined
+        : gameTip(game)?.map((c) => EncodeCard(c)),
     needHandleTrick: needTrick(),
   })
     .then((res) => res.json())

@@ -100,6 +100,8 @@ export class Game {
   id: string;
   players: GamePlayer[];
 
+  __isOnline?: boolean;
+
   /// 回合数
   tricks: { tricks: Trick[]; idx: number }[] = [];
 
