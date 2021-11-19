@@ -226,40 +226,6 @@ export const splitCards = (players: Player[]): GamePlayer[] => {
   }
 };
 
-export const getCardAssets = (card: Card) => {
-  const cs = {
-    [Color.Spade]: "SPADE",
-    [Color.Heart]: "HEART",
-    [Color.Diamond]: "DIAMOND",
-    [Color.Club]: "CLUB",
-  };
-
-  const ns: { [key: number]: string } = {
-    3: "3",
-    4: "4",
-    5: "5",
-    6: "6",
-    7: "7",
-    8: "8",
-    9: "9",
-    10: "10",
-    11: "11-JACK",
-    12: "12-QUEEN",
-    13: "13-KING",
-    14: "1",
-    15: "2",
-    17: "JOKER-2",
-    18: "JOKER-3",
-  };
-
-  const name = () => {
-    if (card.number === 17 || card.number === 18) return ns[card.number];
-    return `${cs[card.color]}-${ns[card.number]}`;
-  };
-
-  return new URL(`../assets/cards/${name()}.svg`, import.meta.url).href;
-};
-
 export const firstCard: Card = { color: Color.Diamond, number: 3 };
 /**
  * 是否是三

@@ -10,7 +10,7 @@ const r = (type: CardsType, weight: number): Result => ({ type, weight });
 describe("分辨牌型", () => {
   it("炸弹", () => {
     expect(dt([14, 14, 14, 14])).toEqual(r(CardsType.zhadan, 14));
-    expect(dt([14, 14, 14])).toEqual(r(CardsType.zhadan, 14));
+    expect(dt([18, 17])).toEqual(r(CardsType.zhadan, 18));
     expect(dt([3, 3, 3, 3])).toEqual(r(CardsType.zhadan, 3));
   });
 
@@ -33,6 +33,7 @@ describe("分辨牌型", () => {
 
   it("三带二", () => {
     expect(dt([3, 3, 3, 4, 4])).toEqual(r(CardsType.sandaier, 3));
+    expect(dt([3, 3, 3, 4, 5])).toBeUndefined();
   });
 
   it("单顺", () => {
@@ -43,27 +44,19 @@ describe("分辨牌型", () => {
   });
 
   it("双顺", () => {
-    expect(dt([3, 3, 4, 4])).toEqual(r(CardsType.shuangshun, 4));
+    expect(dt([3, 3, 4, 4])).toBeUndefined();
     expect(dt([3, 6, 3, 4, 5, 5, 4, 6, 7, 7])).toEqual(
       r(CardsType.shuangshun, 7)
     );
   });
 
-  it("三顺", () => {
-    expect(dt([3, 3, 3, 4, 4, 4])).toEqual(r(CardsType.sanshun, 4));
-    expect(dt([3, 3, 3, 5, 5, 6, 6, 5, 6, 4, 4, 4])).toEqual(
-      r(CardsType.sanshun, 6)
-    );
-  });
-
-  it("飞机带翅膀", () => {
-    expect(dt([3, 3, 3, 4, 4, 4, 5, 6, 7, 8])).toEqual(
-      r(CardsType.feijichibang, 4)
-    );
-  });
-
   it("四带二", () => {
     expect(dt([3, 3, 3, 3, 4, 4])).toEqual(r(CardsType.sidaier, 3));
+    expect(dt([3, 3, 3, 3, 4, 5])).toBeUndefined();
+  });
+
+  it("四带一", () => {
+    expect(dt([3, 3, 3, 3, 4])).toEqual(r(CardsType.sidaiyi, 3));
   });
 });
 
@@ -79,41 +72,32 @@ describe("比较牌的大小", () => {
 
   it("三条比较", () => {
     expect(dn([3, 3, 3], [4, 4, 4], false)).toBe(true);
-    // expect(dn([3, 3, 3], [4, 4, 4, 3], true)).toBe(true);
-    // expect(dn([3, 3, 3, 4, 5], [4, 4, 4, 3], true)).toBe(true);
-    // expect(dn([3, 3, 3, 4, 5], [4, 4, 4, 3], false)).toBe(undefined);
   });
 
   it("炸弹", () => {
     expect(dn([3, 3, 3, 3, 4, 4], [4, 4, 4, 4], true)).toBe(true);
-    expect(dn([3, 3, 3, 3], [14, 14, 14], true)).toBe(true);
+    expect(dn([3, 3, 3, 3], [14, 14, 14, 14], true)).toBe(true);
+    expect(dn([3, 3, 3, 3], [17, 17], true)).toBe(true);
   });
 
   it("双顺", () => {
-    expect(dn([3, 3, 4, 4], [3, 3, 4, 4], true)).toBe(false);
-    expect(dn([3, 3, 4, 4], [4, 4, 5, 5], true)).toBe(true);
-    expect(dn([3, 3, 4, 4], [4, 4, 5, 5, 6, 6], true)).toBeUndefined();
-  });
-
-  it("三顺", () => {
-    expect(dn([3, 3, 3, 4, 4, 4], [4, 4, 4, 5, 5, 5], true)).toBe(true);
+    expect(dn([3, 3, 4, 4, 5, 5], [3, 3, 4, 4, 5, 5], true)).toBe(false);
+    expect(dn([3, 3, 4, 4, 5, 5], [4, 4, 5, 5, 6, 6], true)).toBe(true);
     expect(
-      dn([3, 3, 3, 4, 4, 4], [4, 4, 4, 5, 5, 5, 6, 6, 6], true)
+      dn([3, 3, 4, 4, 5, 5], [4, 4, 5, 5, 6, 6, 7, 7], true)
     ).toBeUndefined();
-  });
-
-  it("飞机带翅膀", () => {
-    expect(
-      dn(
-        [3, 3, 3, 4, 4, 4, 6, 6, 7, 7],
-        [4, 4, 4, 5, 5, 5, 10, 11, 12, 13],
-        true
-      )
-    ).toBe(true);
   });
 
   it("单顺", () => {
     expect(dn([4, 5, 6, 7, 8, 9], [9, 10, 11, 12, 13], true)).toBeUndefined();
+    expect(dn([4, 5, 6, 7, 8, 9], [9, 10, 11, 12, 13, 14], true)).toBe(true);
+    expect(dn([4, 5, 6, 7, 8, 9, 10], [4, 5, 6, 7, 8, 9, 10], true)).toBe(
+      false
+    );
+  });
+
+  it("四带一比较", () => {
+    expect(dn([4, 4, 4, 4, 8], [5, 5, 5, 5, 13], true)).toBe(true);
     expect(dn([4, 5, 6, 7, 8, 9], [9, 10, 11, 12, 13, 14], true)).toBe(true);
     expect(dn([4, 5, 6, 7, 8, 9, 10], [4, 5, 6, 7, 8, 9, 10], true)).toBe(
       false

@@ -13,14 +13,12 @@ export enum CardsType {
   sandaier = 5,
   /// 单顺 数值3（含）以上的5张(含)以上连续单牌。
   danshun = 6,
-  /// 双顺 2对(含)以上连续对牌。如3344、445566778899。
+  /// 双顺 3对(含)以上连续对牌。如3344、445566778899。
   shuangshun = 7,
-  /// 三顺 2个(含)以上连续三条。如jjjqqq、444555666777888。
-  sanshun = 8,
-  /// 飞机带翅膀	 2个或3个连续的三带二。 如888999＋3457、888999+3355、888999+3367
-  feijichibang = 9,
+  /// 四带一
+  sidaiyi = 10,
   /// 四带二
-  sidaier = 10,
+  sidaier = 11,
   /// 炸弹
   zhadan = 11,
 }
@@ -100,17 +98,14 @@ const haveSame = (numbers: number[], target: number) => {
   return undefined;
 };
 
-const isfeiji = (numbers: number[]) => {
-  const res = countArray(numbers);
-  const r = res.filter((r) => r.count === 3);
-  if (r.length >= 2) {
-    /// 没有正确带了翅膀
-    if (r.length * 2 + r.length * 3 !== numbers.length) {
-      return undefined;
-    }
-    const ns = r.map((i) => i.number);
-    if (monotone(ns)) return Math.max(...ns);
-  }
+const haveSameAndExclude = (
+  numbers: number[],
+  exclude: number,
+  target: number
+) => {
+  const res = countArray(numbers.filter((n) => n !== exclude));
+  const r = res.find((r) => r.count === target);
+  if (r) return r.number;
   return undefined;
 };
 
@@ -141,10 +136,6 @@ export const detectTypeNumbers = (numbers: number[]): Result | undefined => {
   }
 
   if (numbers.length === 3 && same(numbers)) {
-    // 三条A单出不带牌时是最大的炸弹，带牌时则作为普通牌型。
-    // if (numbers[0] === 14) {
-    //   return { type: CardsType.zhadan, weight: numbers[0] };
-    // }
     return { type: CardsType.santiao, weight: numbers[0] };
   }
 
@@ -155,20 +146,23 @@ export const detectTypeNumbers = (numbers: number[]): Result | undefined => {
   }
 
   if (numbers.length === 5) {
+    const same4Res = haveSame(numbers, 4);
+    if (same4Res !== undefined)
+      return { type: CardsType.sidaiyi, weight: same4Res };
+
     const res = haveSame(numbers, 3);
-    if (res !== undefined) return { type: CardsType.sandaier, weight: res };
+    if (res !== undefined && haveSameAndExclude(numbers, res, 2)) {
+      return { type: CardsType.sandaier, weight: res };
+    }
   }
   if (numbers.length === 6) {
     const res = haveSame(numbers, 4);
-    if (res !== undefined) return { type: CardsType.sidaier, weight: res };
+    if (res !== undefined && haveSameAndExclude(numbers, res, 2)) {
+      return { type: CardsType.sidaier, weight: res };
+    }
   }
 
-  if (numbers.length === 10) {
-    const res = isfeiji(numbers);
-    if (res !== undefined) return { type: CardsType.feijichibang, weight: res };
-  }
-
-  if (numbers.length >= 4) {
+  if (numbers.length >= 6) {
     if (isShun(numbers, 2)) {
       return { type: CardsType.shuangshun, weight: Math.max(...numbers) };
     }
@@ -177,9 +171,6 @@ export const detectTypeNumbers = (numbers: number[]): Result | undefined => {
   if (numbers.length >= 5) {
     if (Math.max(...numbers) < 15 && monotone(numbers)) {
       return { type: CardsType.danshun, weight: Math.max(...numbers) };
-    }
-    if (isShun(numbers, 3)) {
-      return { type: CardsType.sanshun, weight: Math.max(...numbers) };
     }
   }
 

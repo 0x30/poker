@@ -1,55 +1,11 @@
 import { computed, defineComponent, PropType } from "@vue/runtime-core";
 import { ref } from "vue";
 import { playerName, playerNameCode, usePlayers } from "../../core/Player";
-import { Game, Player } from "../../core/model";
+import { Game, isNpc, Player } from "../../core/model";
 import { splitCards } from "../../core/Card";
 import { useMountComponentAndAnimed } from "../../core/useMountComponentAndAnimed";
 import { getPermutations } from "../../core/util";
-
-export const SelectPlayerItem = defineComponent({
-  props: {
-    player: {
-      type: Object as PropType<Player>,
-      required: true,
-    },
-    selectd: Boolean,
-    onClick: Function as PropType<(player: Player) => void>,
-  },
-  setup: (props) => {
-    return () => {
-      return (
-        <div
-          class={`card shadow-lg compact cursor-pointer side ${
-            props.selectd ? "bg-primary" : "bg-base-100"
-          }`}
-          onClick={() => props.onClick?.(props.player)}
-        >
-          <div class="flex-row items-center space-x-4 card-body">
-            <div>
-              <div class="avatar placeholder">
-                <div class="bg-neutral-focus text-neutral-contentx rounded-full w-14 h-14">
-                  <span>{playerNameCode(props.player)}</span>
-                </div>
-              </div>
-            </div>
-            <div>
-              <h2 class={`card-title ${props.selectd ? "text-white" : null}`}>
-                {playerName(props.player)}
-              </h2>
-              <p
-                class={`${
-                  props.selectd ? "text-white" : "text-base-content"
-                } text-opacity-40`}
-              >
-                {props.player?.host}
-              </p>
-            </div>
-          </div>
-        </div>
-      );
-    };
-  },
-});
+import { SelectPlayerItem } from "./Game";
 
 const SelectPlayer = defineComponent({
   props: {
@@ -58,6 +14,7 @@ const SelectPlayer = defineComponent({
   },
   setup: (props) => {
     const { players } = usePlayers();
+    const exNpcPlayer = computed(() => players.value.filter((p) => !isNpc(p)));
 
     /// 重复对战次数
     const repeatCountRef = ref<string>();
@@ -158,7 +115,7 @@ const SelectPlayer = defineComponent({
   },
 });
 
-export const useGameAlert = () => {
+export const useTrophyAlert = () => {
   return new Promise<Game[]>((resolver) => {
     const close = useMountComponentAndAnimed({
       component: (

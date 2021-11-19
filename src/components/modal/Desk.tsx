@@ -9,18 +9,52 @@ import {
   watchEffect,
 } from "@vue/runtime-core";
 import { computed } from "vue";
-import { debugCard, equal, getCardAssets } from "../../core/Card";
+import { debugCard, equal } from "../../core/Card";
 import {
   getGameCurrentPlayer,
   getGamePlayers,
   getNeedHandleTrick,
   useGame,
 } from "../../core/Game";
-import { Card, Game, isWoodMan } from "../../core/model";
+import { Card, Game, isWoodMan, Color } from "../../core/model";
 import { playerNameCode } from "../../core/Player";
 import { gameTips } from "../../core/Tips";
 import { useMountComponentAndAnimed } from "../../core/useMountComponentAndAnimed";
 import { GameMenu } from "../GameMenu";
+
+const getCardAssets = (card: Card) => {
+  const cs = {
+    [Color.Spade]: "SPADE",
+    [Color.Heart]: "HEART",
+    [Color.Diamond]: "DIAMOND",
+    [Color.Club]: "CLUB",
+  };
+
+  const ns: { [key: number]: string } = {
+    3: "3",
+    4: "4",
+    5: "5",
+    6: "6",
+    7: "7",
+    8: "8",
+    9: "9",
+    10: "10",
+    11: "11-JACK",
+    12: "12-QUEEN",
+    13: "13-KING",
+    14: "1",
+    15: "2",
+    17: "JOKER-2",
+    18: "JOKER-3",
+  };
+
+  const name = () => {
+    if (card.number === 17 || card.number === 18) return ns[card.number];
+    return `${cs[card.color]}-${ns[card.number]}`;
+  };
+
+  return new URL(`../assets/cards/${name()}.svg`, import.meta.url).href;
+};
 
 const CardComp = defineComponent({
   props: {
