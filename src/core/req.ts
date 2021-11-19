@@ -22,9 +22,8 @@ const cfetch = (player: Player, path: string, body: any) => {
 /**
  * 发牌
  */
-export const deal = (game: Game) => {
-  return Promise.resolve();
-};
+export const deal = (game: Game) => Promise.resolve();
+export const broadcast = (game: Game, trick: Trick) => Promise.resolve();
 
 export const askTrick = (game: Game) => {
   const player = getGameCurrentPlayer(game);
@@ -58,8 +57,4 @@ export const askTrick = (game: Game) => {
   })
     .then((res) => res.json())
     .then((res) => new Trick(player, res.data?.map(DecodeCard)));
-};
-
-export const broadcast = (game: Game, trick: Trick) => {
-  return Promise.resolve();
 };
