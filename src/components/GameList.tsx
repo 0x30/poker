@@ -1,4 +1,4 @@
-import { computed, defineComponent, PropType, unref } from "vue";
+import { computed, defineComponent, onMounted, PropType, unref } from "vue";
 import { useGames } from "../core/Games";
 import { getGamePlayers, useGame } from "../core/Game";
 
@@ -6,7 +6,7 @@ import { Card, Game, GamePlayer, Player } from "../core/model";
 import Class from "../style/GameItem.module.scss";
 
 import { useDeskDrawer } from "../components/modal/Desk";
-import { GameMenu } from "./GameMenu";
+import { GameMenuStyle2 as GameMenu } from "./GameMenu";
 import { playerNameCode } from "../core/Player";
 
 const AvatarComp = defineComponent({
@@ -111,55 +111,39 @@ const GameItem = defineComponent({
     },
   },
   setup: (props) => {
-    const { delGame } = useGames();
     const { gameRef, moveCursor, toggle, isAsking } = useGame(
       unref(props.game)
     );
 
-    const splayers = computed(() => getGamePlayers(gameRef.value));
+    onMounted(() => useGame(gameRef.value));
 
     return () => {
       const isFinish = gameRef.value.championer !== undefined;
-      const leftCardNum = splayers.value.reduce(
-        (t, s) => s.leftCards.length + t,
-        0
-      );
-      const deskColor = isFinish ? "#2094f3" : "#009485";
 
       return (
-        <div class="card bg-base-100 shadow-lg px-4 py-4 grid items-center justify-items-center">
-          <GameStat
-            leftCardNum={leftCardNum}
-            isPlaying={gameRef.value.autoStart}
-            tricks={gameRef.value.tricks.length}
-            championer={gameRef.value.championer}
-          />
-          <div class={Class.item}>
-            {splayers.value.map((s) => (
-              <AvatarComp isFinish={isFinish} player={s} key={s.id} />
-            ))}
-            <svg
-              class={Class.desk}
-              xmlns="http://www.w3.org/2000/svg"
-              width="86"
-              height="86"
-            >
-              <path
-                fill={deskColor}
-                stroke="none"
-                d="M34.339745962156 9.6987298107781a10 10 0 0 1 17.320508075689 0l32.679491924311 56.602540378444a10 10 0 0 1 -8.6602540378444 15l-65.358983848622 0a10 10 0 0 1 -8.6602540378444 -15"
-              ></path>
-            </svg>
+        <div class="card shadow-lg compact side bg-base-100">
+          <div class="flex-row items-center space-x-4 card-body">
+            <div class="flex-1">
+              {isFinish ? (
+                <h2 class="card-title text-neutral">完成</h2>
+              ) : (
+                <h2 class="card-title text-info">进行中</h2>
+              )}
+              <p class="text-base-content text-opacity-40 font-mono">
+                {gameRef.value.id}
+              </p>
+            </div>
+            <div class="flex space-x-2 flex-0">
+              <GameMenu
+                onGoDetail={() => useDeskDrawer(gameRef.value)}
+                isAsking={isAsking.value}
+                isFinish={isFinish}
+                isPlaying={gameRef.value.autoStart}
+                onToggle={toggle}
+                onNext={moveCursor}
+              />
+            </div>
           </div>
-          <GameMenu
-            onDelGame={() => delGame(gameRef.value)}
-            onGoDetail={() => useDeskDrawer(gameRef.value)}
-            isAsking={isAsking.value}
-            isFinish={isFinish}
-            isPlaying={gameRef.value.autoStart}
-            onToggle={toggle}
-            onNext={moveCursor}
-          />
         </div>
       );
     };
@@ -168,7 +152,6 @@ const GameItem = defineComponent({
 
 export default defineComponent(() => {
   const { games } = useGames();
-
   return () => {
     return (
       <div class="grid grid-rows-1 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8 py-4">

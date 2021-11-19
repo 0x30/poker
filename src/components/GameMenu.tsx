@@ -124,3 +124,116 @@ export const GameMenu = defineComponent({
     };
   },
 });
+
+export const GameMenuStyle2 = defineComponent({
+  props: {
+    isAsking: Boolean,
+    isPlaying: Boolean,
+    isFinish: Boolean,
+    isCanCancel: Boolean,
+    isTrash: Boolean,
+    onDelGame: Function as PropType<() => void>,
+    onTrash: Function as PropType<() => void>,
+    onCancel: Function as PropType<() => void>,
+    onClose: Function as PropType<() => void>,
+    onToggle: Function as PropType<() => void>,
+    onGoDetail: Function as PropType<() => void>,
+    onNext: Function as PropType<() => Promise<void>>,
+  },
+  setup: (props) => {
+    return () => {
+      const btns = () => {
+        const res = [];
+
+        if (props.isAsking === false && props.onDelGame) {
+          res.push(
+            <button
+              class="btn btn-sm btn-square px-5"
+              onClick={props.onDelGame}
+            >
+              <i class="gg-trash"></i>
+            </button>
+          );
+        }
+
+        if (
+          props.isFinish === false &&
+          props.isPlaying === false &&
+          props.isAsking === false
+        ) {
+          if (props.onTrash) {
+            res.push(
+              <button
+                disabled={props.isCanCancel === false}
+                class="btn btn-sm btn-square"
+                onClick={props.onTrash}
+              >
+                <i class="gg-undo"></i>
+              </button>
+            );
+          }
+
+          if (props.onCancel) {
+            res.push(
+              <button
+                disabled={props.isCanCancel === false}
+                class="btn btn-sm btn-square"
+                onClick={props.onCancel}
+              >
+                <i class="gg-mail-reply"></i>
+              </button>
+            );
+          }
+        }
+
+        return res;
+      };
+
+      return (
+        <>
+          {btns()}
+          {props.isFinish === false && props.onToggle ? (
+            <button
+              class={`btn btn-sm btn-square ${
+                props.isPlaying ? "btn-active" : ""
+              }`}
+              onClick={props.onToggle}
+            >
+              {props.isPlaying ? (
+                <i class="gg-play-pause transform "></i>
+              ) : (
+                <i class="gg-play-button transform "></i>
+              )}
+            </button>
+          ) : null}
+
+          {props.onGoDetail && (props.isPlaying === false || props.isFinish) ? (
+            <button class="btn btn-sm btn-square" onClick={props.onGoDetail}>
+              <i class="gg-eye transform "></i>
+            </button>
+          ) : null}
+          {props.isFinish ||
+          props.isPlaying ||
+          props.onNext === undefined ? null : (
+            <>
+              <button
+                class={`btn btn-sm btn-square px-2 ${
+                  props.isAsking ? "loading" : ""
+                }`}
+                onClick={props.onNext}
+              >
+                <i class="gg-play-track-next transform "></i>
+              </button>
+            </>
+          )}
+
+          {props.onClose ? (
+            <button class="btn btn-sm btn-square" onClick={props.onClose}>
+              <i class="gg-close"></i>
+            </button>
+          ) : null}
+        </>
+      );
+    };
+  },
+});

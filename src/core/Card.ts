@@ -226,6 +226,35 @@ export const splitCards = (players: Player[]): GamePlayer[] => {
   }
 };
 
+export const newVersionsplitCards = (players: Player[]): GamePlayer[][] => {
+  const hasWoodMan = players.find((p) => isWoodMan(p));
+  const result = shuffle(deskCards);
+  if (hasWoodMan) {
+    if (hasFirstCard(result.slice(0, 8))) return newVersionsplitCards(players);
+    const users = players.filter((p) => !isWoodMan(p));
+    return [
+      [
+        new GamePlayer(WoodmanPlayer, result.slice(0, 8)),
+        new GamePlayer(users[0], result.slice(8, 31)),
+        new GamePlayer(users[1], result.slice(31, 54)),
+      ],
+      [
+        new GamePlayer(WoodmanPlayer, result.slice(0, 8)),
+        new GamePlayer(users[1], result.slice(8, 31)),
+        new GamePlayer(users[0], result.slice(31, 54)),
+      ],
+    ];
+  } else {
+    return [
+      [
+        new GamePlayer(players[0], result.slice(0, 18)),
+        new GamePlayer(players[1], result.slice(18, 36)),
+        new GamePlayer(players[2], result.slice(36, 54)),
+      ],
+    ];
+  }
+};
+
 export const firstCard: Card = { color: Color.Diamond, number: 3 };
 /**
  * 是否是三

@@ -9,23 +9,21 @@ import { useTrophyAlert } from "../modal/Trophy";
 
 export default defineComponent(() => {
   const { addPlayer } = usePlayers();
-  const { addGame } = useGames();
+  const { addGames } = useGames();
 
   const clickAddTrophy = async () => {
-    const player = await useTrophyAlert();
-    // addPlayer(player);
+    const games = await useTrophyAlert();
+    addGames(games);
   };
 
   const clickAddPlayer = async () => {
-    const player = await useTrophyAlert();
-    // addPlayer(player);
+    const player = await usePlayerAlert();
+    addPlayer(player);
   };
 
   const clickAddGame = async () => {
     const games = await useGameAlert();
-    for await (const game of games) {
-      addGame(game);
-    }
+    addGames(games);
   };
 
   return () => {
@@ -34,7 +32,7 @@ export default defineComponent(() => {
         <div class="flex-1 px-2 mx-2">
           <span class="text-lg font-bold">跑得快</span>
         </div>
-        {/* <div>
+        <div>
           <button
             data-tip="开始比赛"
             class="btn btn-square btn-ghost tooltip flex items-center"
@@ -42,7 +40,7 @@ export default defineComponent(() => {
           >
             <i class="gg-trophy"></i>
           </button>
-        </div> */}
+        </div>
         <div>
           <button
             data-tip="增加用户"

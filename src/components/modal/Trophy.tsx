@@ -1,8 +1,8 @@
 import { computed, defineComponent, PropType } from "@vue/runtime-core";
 import { ref } from "vue";
-import { playerName, playerNameCode, usePlayers } from "../../core/Player";
-import { Game, isNpc, Player } from "../../core/model";
-import { splitCards } from "../../core/Card";
+import { usePlayers } from "../../core/Player";
+import { Game, isNpc, Player, WoodmanPlayer } from "../../core/model";
+import { newVersionsplitCards } from "../../core/Card";
 import { useMountComponentAndAnimed } from "../../core/useMountComponentAndAnimed";
 import { getPermutations } from "../../core/util";
 import { SelectPlayerItem } from "./Game";
@@ -13,18 +13,8 @@ const SelectPlayer = defineComponent({
     onDismiss: Function as PropType<() => void>,
   },
   setup: (props) => {
-    const { players } = usePlayers();
-    const exNpcPlayer = computed(() => players.value.filter((p) => !isNpc(p)));
-
-    /// 重复对战次数
-    const repeatCountRef = ref<string>();
-    const repeatCountValue = computed(() => {
-      const result = Number.parseInt(repeatCountRef.value ?? "1");
-      const count = Number.isNaN(result) ? 1 : result;
-      return Math.max(1, count);
-    });
-
-    const autoStartRef = ref(false);
+    const { players: ps } = usePlayers();
+    const players = computed(() => ps.value.filter((p) => !isNpc(p)));
 
     const selectPlayers = ref<Player[]>([]);
     const isSelected = (player: Player) => {
@@ -40,19 +30,27 @@ const SelectPlayer = defineComponent({
       }
     };
 
-    const isCanSubmit = computed(() => selectPlayers.value.length >= 3);
+    const isCanSubmit = computed(() => selectPlayers.value.length >= 2);
 
     const click = () => {
-      // 每一组三个人，按照选中的个数划分组
-      const permutationPlayers = getPermutations(selectPlayers.value, 3);
+      // 每组两个人
+      const permutationPlayers = getPermutations(selectPlayers.value, 2).map(
+        (us) => [...us, ...[WoodmanPlayer]]
+      );
       // 按照组 每一组重复对战次数
       const result = permutationPlayers.flatMap((players) => {
-        const res = new Array(repeatCountValue.value).fill("").map(() => {
-          return splitCards(players);
+        const res = new Array(1).fill("").flatMap(() => {
+          return newVersionsplitCards(players);
         });
         return res;
       });
-      props.onSubmit?.(result.map((r) => new Game(r, autoStartRef.value)));
+      props.onSubmit?.(
+        result.map((r) => {
+          const game = new Game(r, true);
+          game.__isOnline = true;
+          return game;
+        })
+      );
     };
 
     return () => {
@@ -70,39 +68,13 @@ const SelectPlayer = defineComponent({
               ))}
             </div>
 
-            <div class="flex items-center space-x-3">
-              <div class="form-control mt-3 flex-1">
-                <label class="label">
-                  <span class="label-text">每组选手的对战次数</span>
-                </label>
-                <input
-                  type="number"
-                  v-model={repeatCountRef.value}
-                  max={10}
-                  placeholder="默认一次，请尽可能的不要超过5次"
-                  class="input input-bordered font-mono"
-                />
-              </div>
-
-              <div class="form-control mt-3 flex flex-col">
-                <label class="label">
-                  <span class="label-text">是否自动开对战</span>
-                </label>
-                <input
-                  type="checkbox"
-                  v-model={autoStartRef.value}
-                  class="toggle toggle-lg self-center"
-                />
-              </div>
-            </div>
-
             <div class="modal-action">
               <button
                 class="btn btn-primary px-8"
                 disabled={!isCanSubmit.value}
                 onClick={click}
               >
-                增加
+                开赛
               </button>
               <button class="btn px-8" onClick={props.onDismiss}>
                 取消

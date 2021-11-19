@@ -21,8 +21,8 @@ export const useGames = () => {
       .forEach((p) => (queues[p.id] = new Queue({ concurrency: 1 })));
   };
 
-  const addGame = async (game: Game) => {
-    await db.setItem(game.id, game);
+  const addGames = async (games: Game[]) => {
+    await Promise.all(games.map((g) => db.setItem(g.id, g)));
     refreshGames();
   };
 
@@ -49,7 +49,7 @@ export const useGames = () => {
 
   return {
     games,
-    addGame,
+    addGames,
     delGame,
     updateGame,
   };
