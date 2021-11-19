@@ -23,17 +23,7 @@ const cfetch = (player: Player, path: string, body: any) => {
  * 发牌
  */
 export const deal = (game: Game) => {
-  return Promise.all(
-    game.players
-      .map((p) => ({ ...p, ...{ leftCards: undefined } }))
-      .filter((p) => isNpc(p) === false)
-      .map((p) =>
-        cfetch(p, "/deal", {
-          gameId: game.id,
-          cards: p.cards.map(EncodeCard),
-        })
-      )
-  );
+  return Promise.resolve();
 };
 
 export const askTrick = (game: Game) => {
@@ -71,15 +61,5 @@ export const askTrick = (game: Game) => {
 };
 
 export const broadcast = (game: Game, trick: Trick) => {
-  return Promise.all(
-    game.players
-      .map((p) => ({ ...p, ...{ leftCards: undefined } }))
-      .filter((p) => isNpc(p) === false)
-      .map((p) =>
-        cfetch(p, "/broadcast", {
-          gameId: game.id,
-          trick: { ...trick, ...{ cards: trick.cards?.map(EncodeCard) } },
-        })
-      )
-  );
+  return Promise.resolve();
 };
