@@ -32,36 +32,17 @@ export const GameMenu = defineComponent({
           );
         }
 
-        if (
-          props.isFinish === false &&
-          props.isPlaying === false &&
-          props.isAsking === false
-        ) {
-          if (props.onTrash) {
-            res.push(
-              <button
-                disabled={props.isCanCancel === false}
-                data-tip="移除全部操作"
-                class="tooltip btn btn-outline btn-sm"
-                onClick={props.onTrash}
-              >
-                <i class="gg-undo"></i>
-              </button>
-            );
-          }
-
-          if (props.onCancel) {
-            res.push(
-              <button
-                disabled={props.isCanCancel === false}
-                data-tip="撤销一步操作"
-                class="tooltip btn btn-outline btn-sm"
-                onClick={props.onCancel}
-              >
-                <i class="gg-mail-reply"></i>
-              </button>
-            );
-          }
+        if (props.onTrash) {
+          res.push(
+            <button
+              disabled={props.isCanCancel === false}
+              data-tip="移除全部操作"
+              class="tooltip btn btn-outline btn-sm"
+              onClick={props.onTrash}
+            >
+              <i class="gg-undo"></i>
+            </button>
+          );
         }
         return res;
       };
