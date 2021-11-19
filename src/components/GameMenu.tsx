@@ -50,26 +50,6 @@ export const GameMenu = defineComponent({
       return (
         <div class="btn-group">
           {btns()}
-          {props.isFinish === false && props.onToggle ? (
-            <button
-              data-tip={
-                props.isPlaying
-                  ? "自动模式，点击切换为手动"
-                  : "手动模式，点击切换为自动"
-              }
-              class={`btn tooltip btn-outline btn-sm ${
-                props.isPlaying ? "btn-active" : ""
-              }`}
-              onClick={props.onToggle}
-            >
-              {props.isPlaying ? (
-                <i class="gg-play-pause transform "></i>
-              ) : (
-                <i class="gg-play-button transform "></i>
-              )}
-            </button>
-          ) : null}
-
           {props.onGoDetail && (props.isPlaying === false || props.isFinish) ? (
             <button
               data-tip="查看详情"
