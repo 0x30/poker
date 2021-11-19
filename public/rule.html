@@ -482,22 +482,10 @@
         </thead>
         <tbody>
           <tr>
-            <td>/deal</td>
-            <td>分发牌。向每个游戏玩家发牌</td>
-            <td>DealRequest</td>
-            <td>无</td>
-          </tr>
-          <tr>
             <td>/ask</td>
             <td>向玩家询问要出的牌</td>
             <td>AskRequest</td>
             <td>AskResponse</td>
-          </tr>
-          <tr>
-            <td>/broadcast</td>
-            <td>在用户出牌后，广而告之</td>
-            <td>BroadcastRequest</td>
-            <td>无</td>
           </tr>
         </tbody>
       </table>
@@ -535,15 +523,6 @@ export interface Trick {
   cards: Card[];
 }
 
-export interface DealRequest {
-  /// 一个服务器可能会同时出现，多场游戏，游戏ID可以区分
-  gameId: string;
-  /// 这是游戏开始的时候，你的初始牌组
-  cards: Card[];
-  /// 一个服务器是可以被添加多个用户的，用户ID可以区分
-  userId: string;
-}
-
 export interface AskRequest {
   /// 一个服务器可能会同时出现，多场游戏，游戏ID可以区分
   gameId: string;
@@ -554,24 +533,16 @@ export interface AskRequest {
   /// 上一架的出得牌，你需要压上的卡组
   needHandleTrick: Trick;
   /// 一个服务器是可以被添加多个用户的，用户ID可以区分
-  userId: string;
+  player: Player & {
+    cards: Card[] // 玩家初始卡组
+  };
 }
 
 export interface AskResponse {
   /// 返回要出的卡牌
   /// 不反回 data 则为 跳过 pass
   data?: Card[];
-}
-
-/// 在用户出牌之后，会将这个动作广播给所有人，包括出牌者自己
-export interface BroadcastRequest {
-  /// 一个服务器可能会同时出现，多场游戏，游戏ID可以区分
-  gameId: string;
-  /// 出牌的回合详情
-  trick: Trick;
-  /// 一个服务器是可以被添加多个用户的，用户ID可以区分
-  userId: string;
-}          
+}      
         </code>        
       </pre>
     </div>
