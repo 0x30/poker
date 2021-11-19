@@ -111,17 +111,19 @@ export const isGameFinish = (game: Game) => game.championer !== undefined;
  * 获取游戏当前的用户
  */
 export const getGameCurrentPlayer = (game: Game) => {
+  const players = game.players.sort((a, b) => a.createTime - b.createTime);
+
   // 当前没有回合.默认获取 黑桃三 的拥有者作为当前用户
   if (game.tricks.length === 0) {
-    return game.players.find((p) => hasFirstCard(p.cards))!;
+    return players.find((p) => hasFirstCard(p.cards))!;
   }
   if (getNeedHandleTrick(game) === undefined) {
     const pid = getGameLastTricks(game)?.slice(2, 3)[0].player.id;
-    return game.players.find((p) => p.id === pid)!;
+    return players.find((p) => p.id === pid)!;
   }
   const lastPlayer = getGameLastTricks(game)?.[0].player;
-  const li = game.players.findIndex((p) => p.id === lastPlayer?.id);
-  return game.players[(li + 2) % 3];
+  const li = players.findIndex((p) => p.id === lastPlayer?.id);
+  return players[(li + 2) % 3];
 };
 
 export const getGamePlayerLastCards = (game: Game, player: Player) => {
@@ -173,6 +175,7 @@ const __useGame = (g: Game) => {
   };
 
   const trashTricks = () => {
+    gameRef.value.championer = undefined;
     gameRef.value.tricks = [];
     triggerRef(gameRef);
     updateGame(gameRef.value);
