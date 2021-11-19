@@ -12,7 +12,7 @@ const removeDuplicate = (cards: Card[][]) => {
   const set = new Set<string>();
   const calculatorCards: Card[][] = [];
   for (const cs of cards) {
-    const chs = cardsHexStr(cs);
+    const chs = cs.toString();
     if (set.has(chs) === false) {
       set.add(chs);
       calculatorCards.push(cs);

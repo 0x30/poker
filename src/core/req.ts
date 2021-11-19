@@ -61,9 +61,7 @@ export const askTrick = (game: Game) => {
     gameId: game.id,
     history: history(),
     tips:
-      game.__isOnline === true
-        ? []
-        : gameTip(game)?.map((c) => EncodeCard(c)),
+      game.__isOnline === true ? [] : gameTip(game)?.map((c) => EncodeCard(c)),
     needHandleTrick: needTrick(),
   })
     .then((res) => res.json())

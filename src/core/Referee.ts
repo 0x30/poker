@@ -128,7 +128,7 @@ export const detectTypeNumbers = (numbers: number[]): Result | undefined => {
 
   if (numbers.length === 2) {
     if (numbers.every((n) => [17, 18].includes(n))) {
-      return { type: CardsType.zhadan, weight: Math.max(...numbers) };
+      return { type: CardsType.zhadan, weight: 18 };
     }
     if (same(numbers)) {
       return { type: CardsType.dui, weight: numbers[0] };
@@ -145,35 +145,35 @@ export const detectTypeNumbers = (numbers: number[]): Result | undefined => {
     if (res !== undefined) return { type: CardsType.sandaiyi, weight: res };
   }
 
-  if (numbers.length === 5) {
-    const same4Res = haveSame(numbers, 4);
-    if (same4Res !== undefined)
-      return { type: CardsType.sidaiyi, weight: same4Res };
-
-    const res = haveSame(numbers, 3);
-    if (res !== undefined && haveSameAndExclude(numbers, res, 2)) {
-      return { type: CardsType.sandaier, weight: res };
-    }
-  }
-  if (numbers.length === 6) {
-    const res = haveSame(numbers, 4);
-    if (res !== undefined && haveSameAndExclude(numbers, res, 2)) {
-      return { type: CardsType.sidaier, weight: res };
-    }
-  }
-
-  if (numbers.length >= 6) {
-    if (isShun(numbers, 2)) {
-      return { type: CardsType.shuangshun, weight: Math.max(...numbers) };
-    }
-  }
-
   if (numbers.length >= 5) {
+    if (numbers.length === 5) {
+      const same4Res = haveSame(numbers, 4);
+      if (same4Res !== undefined)
+        return { type: CardsType.sidaiyi, weight: same4Res };
+
+      const res = haveSame(numbers, 3);
+      if (res !== undefined && haveSameAndExclude(numbers, res, 2)) {
+        return { type: CardsType.sandaier, weight: res };
+      }
+    }
+
     if (Math.max(...numbers) < 15 && monotone(numbers)) {
       return { type: CardsType.danshun, weight: Math.max(...numbers) };
     }
   }
 
+  if (numbers.length >= 6) {
+    if (numbers.length === 6) {
+      const res = haveSame(numbers, 4);
+      if (res !== undefined && haveSameAndExclude(numbers, res, 2)) {
+        return { type: CardsType.sidaier, weight: res };
+      }
+    }
+
+    if (isShun(numbers, 2)) {
+      return { type: CardsType.shuangshun, weight: Math.max(...numbers) };
+    }
+  }
   return undefined;
 };
 
