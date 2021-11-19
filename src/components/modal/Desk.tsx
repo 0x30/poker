@@ -53,7 +53,7 @@ const getCardAssets = (card: Card) => {
     return `${cs[card.color]}-${ns[card.number]}`;
   };
 
-  return new URL(`../assets/cards/${name()}.svg`, import.meta.url).href;
+  return new URL(`../../assets/cards/${name()}.svg`, import.meta.url).href;
 };
 
 const CardComp = defineComponent({
