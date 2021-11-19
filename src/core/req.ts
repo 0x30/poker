@@ -67,5 +67,11 @@ export const askTrick = (game: Game) => {
     needHandleTrick: needTrick(),
   })
     .then((res) => res.json())
-    .then((res) => new Trick(player, res.data?.map(DecodeCard)));
+    .then((res) => {
+      let cards = undefined;
+      if (res.data?.length > 0) {
+        cards = res.data?.map(DecodeCard);
+      }
+      return new Trick(player, cards);
+    });
 };
