@@ -249,6 +249,16 @@ export const newVersionsplitCards = (players: Player[]): GamePlayer[][] => {
         new GamePlayer(players[1], result.slice(18, 36)),
         new GamePlayer(players[2], result.slice(36, 54)),
       ],
+      [
+        new GamePlayer(players[2], result.slice(0, 18)),
+        new GamePlayer(players[0], result.slice(18, 36)),
+        new GamePlayer(players[1], result.slice(36, 54)),
+      ],
+      [
+        new GamePlayer(players[1], result.slice(0, 18)),
+        new GamePlayer(players[2], result.slice(18, 36)),
+        new GamePlayer(players[0], result.slice(36, 54)),
+      ],
     ];
   }
 };
