@@ -12,7 +12,7 @@ const cfetch = (player: Player, path: string, body: any) => {
     body === undefined
       ? undefined
       : {
-          body: JSON.stringify({ ...body, ...{ userId: player.id } }),
+          body: JSON.stringify({ ...body, ...{ player } }),
           headers: { "content-type": "application/json" },
           method: "POST",
         };
