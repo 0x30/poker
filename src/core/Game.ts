@@ -6,7 +6,7 @@ import { detect, duel } from "./Referee";
 
 import { askTrick, broadcast, deal } from "./req";
 
-const getGameLastTricks = (game: Game): Trick[] | undefined => {
+export const getGameLastTricks = (game: Game): Trick[] | undefined => {
   return game.tricks
     .slice(-1)
     .sort((a, b) => b.idx - a.idx)[0]

@@ -3,8 +3,33 @@ import { getGameCurrentPlayer, getNeedHandleTrick } from "./Game";
 import { Game, GamePlayer, isRobot, isWoodMan, Player, Trick } from "./model";
 import { gameTip } from "./Tips";
 
+import MyWorker from "./reqWorker?worker";
+import { generateId } from "./util";
+import { sample } from "lodash";
+
+const workers = [
+  new MyWorker(),
+  new MyWorker(),
+  new MyWorker(),
+  new MyWorker(),
+];
+
 const url = (player: Player, path: string) => {
   return `http://${player.host}${path}`;
+};
+
+const fetch = (url: string, params: any) => {
+  const worker = sample(workers);
+  return new Promise<any>((resolve) => {
+    const id = generateId();
+    const handler = (event: any) => {
+      if (event.data.id !== id) return;
+      worker?.removeEventListener("message", handler);
+      resolve(event.data.res);
+    };
+    worker?.addEventListener("message", handler);
+    worker?.postMessage({ id, url, params });
+  });
 };
 
 const cfetch = (player: GamePlayer, path: string, body: any) => {
@@ -63,13 +88,11 @@ export const askTrick = (game: Game) => {
     tips:
       game.__isOnline === true ? [] : gameTip(game)?.map((c) => EncodeCard(c)),
     needHandleTrick: needTrick(),
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      let cards = undefined;
-      if (res.data?.length > 0) {
-        cards = res.data?.map(DecodeCard);
-      }
-      return new Trick(player, cards);
-    });
+  }).then((res) => {
+    let cards = undefined;
+    if (res.data?.length > 0) {
+      cards = res.data?.map(DecodeCard);
+    }
+    return new Trick(player, cards);
+  });
 };

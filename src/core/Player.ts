@@ -22,6 +22,13 @@ export const equal = (player?: Player, player2?: Player) => {
   return player?.id === player2?.id;
 };
 
+export const getPlayers = async () => {
+  const keys = await db.keys();
+  return await Promise.all(
+    keys.map((k) => db.getItem<Player>(k) as any as Player)
+  );
+};
+
 export const usePlayers = () => {
   const refreshPlayers = async () => {
     const keys = await db.keys();
