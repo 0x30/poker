@@ -241,10 +241,14 @@ const DeskPlayer = defineComponent({
       if (isCurrent === false) selectIdxRef.value.clear();
       return isCurrent;
     });
-    
+
     let tipIndex = 0;
     watchEffect(() => {
-      if (isCurrentPlayer.value === true && isWoodMan(player.value))
+      if (
+        gameRef.value.championer === undefined &&
+        isCurrentPlayer.value === true &&
+        isWoodMan(player.value)
+      )
         manualPlay(player.value);
       tipIndex = 0;
     });
