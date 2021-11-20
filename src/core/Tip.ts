@@ -1,6 +1,6 @@
-import { jokers } from "./Card";
+import { hasFirstCard, jokers } from "./Card";
 import { Card } from "./model";
-import { CardsType, detect, monotone, Result } from "./Referee";
+import { CardsType, countArray, detect, monotone } from "./Referee";
 import { useCache } from "./util";
 
 const cardsHexStr = (cards: Card[]) => {
@@ -12,7 +12,7 @@ const removeDuplicate = (cards: Card[][]) => {
   const set = new Set<string>();
   const calculatorCards: Card[][] = [];
   for (const cs of cards) {
-    const chs = cs.toString();
+    const chs = cardsHexStr(cs);
     if (set.has(chs) === false) {
       set.add(chs);
       calculatorCards.push(cs);
@@ -56,8 +56,18 @@ const re = (cs: Card[], exclude: number, repeat: 2 | 3 | 4) => {
   return cache(key, () => _re(cs, exclude, repeat));
 };
 
-const getSmalls = (cards: Card[], exclude: number[], size: number) => {
-  return cards.filter((c) => !exclude.includes(c.number)).slice(0, size);
+export const getSmalls = (cards: Card[], exclude: number[], size: number) => {
+  const countsRes = countArray(
+    cards.filter((c) => !exclude.includes(c.number)).map((c) => c.number)
+  );
+  const result = countsRes
+    .filter((c) => c.count === size)
+    .sort((a, b) => a.number - b.number);
+
+  if (result.length <= 0 || result[0].number > 10) {
+    return cards.filter((c) => !exclude.includes(c.number)).slice(0, size);
+  }
+  return cards.filter((c) => c.number === result[0].number);
 };
 
 const getCardsSame = (val: number, cards: Card[], size: 2 | 3) => {
@@ -69,11 +79,11 @@ const kingBoom = (cards: Card[]): Card[][] => {
   return [];
 };
 
-const danshunCards = (size: number, result: Result, cards: Card[]) => {
+const danshunCards = (size: number, weight: number, cards: Card[]) => {
   const f: number[] = [];
   const eligibles = cards.filter((c) => {
     if (f.includes(c.number)) return false;
-    if (c.number > result.weight - size + 1 && c.number < 15 /**小于 2 */) {
+    if (c.number > weight - size + 1 && c.number < 15 /**小于 2 */) {
       f.push(c.number);
       return true;
     }
@@ -88,16 +98,16 @@ const danshunCards = (size: number, result: Result, cards: Card[]) => {
 
 const repeatShunCards = (
   length: number,
-  result: Result,
+  weight: number,
   cards: Card[],
   size: 2 | 3
 ) => {
   const duizis = repeatCard(cards, size).filter(
-    (cs) => cs[0].number > result.weight - length / size
+    (cs) => cs[0].number > weight - length / size
   );
   if (duizis.length < length / size) return [];
   const res = duizis.flatMap((cs) => cs);
-  return danshunCards(length / size, result, res).map((items) =>
+  return danshunCards(length / size, weight, res).map((items) =>
     items.reduce(
       (t, c) => [...t, ...getCardsSame(c.number, res, 2)],
       [] as Card[]
@@ -145,11 +155,11 @@ export const tips = (cs: Card[], cardsPool: Card[]) => {
               cs[0].number > result.weight &&
               re(cards, cs[0].number, 2).length > 0
           )
-          .map((cs) => [...cs, ...re(cards, cs[0].number, 2)[0]]);
+          .map((cs) => [...cs, ...getSmalls(cards, [cs[0].number], 2)]);
       case CardsType.danshun:
-        return danshunCards(cs.length, result, cards);
+        return danshunCards(cs.length, result.weight, cards);
       case CardsType.shuangshun:
-        return repeatShunCards(cs.length, result, cards, 2);
+        return repeatShunCards(cs.length, result.weight, cards, 2);
       case CardsType.sidaier:
         return repeatCard(cards, 4)
           .filter(
@@ -157,7 +167,7 @@ export const tips = (cs: Card[], cardsPool: Card[]) => {
               cs[0].number > result.weight &&
               re(cards, cs[0].number, 2).length > 0
           )
-          .map((cs) => [...cs, ...re(cards, cs[0].number, 2)[0]]);
+          .map((cs) => [...cs, ...getSmalls(cards, [cs[0].number], 2)]);
       case CardsType.sidaiyi:
         return repeatCard(cards, 4)
           .filter((cs) => cs[0].number > result.weight)

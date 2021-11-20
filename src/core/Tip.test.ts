@@ -1,5 +1,5 @@
 import { Card } from "./model";
-import { tips } from "./Tip";
+import { getSmalls, tips } from "./Tip";
 
 const C = (number: number): Card => ({ number, color: 1 });
 
@@ -19,9 +19,12 @@ describe("测试提示功能", () => {
   it("三带", () => {
     expect(tip([3, 3, 3], [4, 4, 4, 5, 6, 6, 6, 7])).toEqual("4,4,4@6,6,6");
     expect(tip([3, 3, 3, 4], [4, 4, 4, 5, 6, 6, 6, 7])).toEqual(
-      "4,4,4,5@6,6,6,4"
+      "4,4,4,5@6,6,6,5"
     );
     expect(tip([3, 3, 3, 4, 4], [4, 4, 4, 5, 6, 6, 7])).toEqual("4,4,4,6,6");
+    expect(tip([3, 3, 3, 4, 4], [4, 4, 4, 5, 6, 6, 6, 7, 7])).toEqual(
+      "4,4,4,7,7@6,6,6,7,7"
+    );
     expect(tip([3, 3, 3, 4, 4], [4, 4, 4, 5, 6, 7])).toEqual("");
   });
 
@@ -46,5 +49,9 @@ describe("测试提示功能", () => {
   it("炸弹", () => {
     expect(tip([2, 2, 2, 2], [17, 18])).toEqual("17,18");
     expect(tip([3, 3, 3, 3], [15, 15, 15, 15, 5, 5])).toEqual("15,15,15,15");
+  });
+
+  it("三带一小牌逻辑", () => {
+    expect(getSmalls([3, 3, 4, 5, 5].map(C), [], 1)[0].number).toBe(4);
   });
 });
