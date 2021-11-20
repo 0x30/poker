@@ -167,8 +167,6 @@ const TrickList = defineComponent({
     },
   },
   setup: (props) => {
-    const { gameRef } = useGame(props.game);
-
     const listRef = ref<HTMLElement>();
 
     const scrollToBottom = () => {
@@ -184,7 +182,7 @@ const TrickList = defineComponent({
     onUpdated(scrollToBottom);
 
     return () => {
-      const tricks = gameRef.value.tricks.sort((a, b) => a.idx - b.idx);
+      const tricks = props.game.tricks.slice().sort((a, b) => a.idx - b.idx);
       return (
         <div
           ref={listRef}
