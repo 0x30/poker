@@ -90,7 +90,7 @@ export class Trick {
   cards: Card[] | undefined = [];
 
   constructor(player: Player, cards: Card[] | undefined) {
-    this.createTime = new Date().getTime();
+    this.createTime = performance.now();
     this.player = { ...player, ...{ cards: undefined } };
     this.cards = cards;
   }

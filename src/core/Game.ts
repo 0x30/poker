@@ -4,11 +4,10 @@ import { useGames } from "./Games";
 import { Card, Game, Player, Trick } from "./model";
 import { detect, duel } from "./Referee";
 
-import { askTrick, broadcast, deal } from "./req";
+import { askTrick } from "./req";
 
 export const getGameLastTricks = (game: Game): Trick[] | undefined => {
   return game.tricks
-    .slice(-1)
     .sort((a, b) => b.idx - a.idx)[0]
     .tricks.sort((a, b) => b.createTime - a.createTime);
 };
@@ -156,23 +155,22 @@ export const getGamePlayers = (game: Game) => {
 
 const __useGameCache: { [key: string]: ReturnType<typeof __useGame> } = {};
 
-const __useGame = (g: Game) => {
-  const gameRef = ref(g);
+const __useGame = (game: Game) => {
+  const gameRef = ref(game);
 
   const { updateGame } = useGames();
 
   const isAsking = ref(false);
 
   const toggle = () => {
-    gameRef.value.autoStart = !gameRef.value.autoStart;
-    if (gameRef.value.autoStart === true) moveCursor();
-    updateGame(gameRef.value);
+    game.autoStart = !game.autoStart;
+    if (game.autoStart === true) moveCursor();
+    updateGame(game);
   };
 
   const start = async () => {
-    if (gameRef.value.championer !== undefined) return;
-    await deal(gameRef.value);
-    if (gameRef.value.autoStart === true) moveCursor();
+    if (game.championer !== undefined) return;
+    if (game.autoStart === true) moveCursor();
   };
 
   const manualPlay = (player: Player, cards?: Card[]) => {
@@ -181,20 +179,19 @@ const __useGame = (g: Game) => {
   };
 
   const trashTricks = () => {
-    gameRef.value.championer = undefined;
-    gameRef.value.tricks = [];
+    game.championer = undefined;
+    game.tricks = [];
     triggerRef(gameRef);
-    updateGame(gameRef.value);
+    updateGame(game);
   };
 
   const cancelTrick = () => {
-    getGameLastTricks(gameRef.value)?.shift();
+    getGameLastTricks(game)?.shift();
     triggerRef(gameRef);
-    updateGame(gameRef.value);
+    updateGame(game);
   };
 
   const moveCursor = async () => {
-    const game = toRaw(gameRef.value);
     if (game.championer !== undefined) return;
 
     // 获取下一个人的出牌
@@ -203,21 +200,19 @@ const __useGame = (g: Game) => {
       const trick = await askTrick(game);
       isAsking.value = false;
       handleTrick(trick);
-      if (gameRef.value.autoStart === true) moveCursor();
+      if (game.autoStart === true) moveCursor();
     } catch (error) {
       isAsking.value = false;
     }
   };
 
   const handleTrick = (trick: Trick) => {
-    const game = toRaw(gameRef.value);
     const needHandleTrick = getNeedHandleTrick(game);
     try {
       const t = check(game, trick);
       if (needHandleTrick === undefined) {
         game.tricks.push({ idx: game.tricks.length, tricks: [t] });
       } else getGameLastTricks(game)?.push(trick);
-      broadcast(game, t);
       if (checkGameFinish(game, trick.player)) {
         game.championer = trick.player;
       }

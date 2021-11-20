@@ -52,12 +52,6 @@ const cfetch = (player: GamePlayer, path: string, body: any) => {
   return fetch(url(player, path), { ...params, ...{ mode: "cors" } });
 };
 
-/**
- * 发牌
- */
-export const deal = (game: Game) => Promise.resolve();
-export const broadcast = (game: Game, trick: Trick) => Promise.resolve();
-
 export const askTrick = (game: Game) => {
   const player = getGameCurrentPlayer(game);
   if (isWoodMan(player)) return Promise.resolve(new Trick(player, undefined));
