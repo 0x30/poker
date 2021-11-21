@@ -4,6 +4,7 @@ import { Game } from "./model";
 import Queue from "p-queue";
 
 const db = localforage.createInstance({
+  driver: localforage.LOCALSTORAGE,
   name: "games",
   storeName: "games",
 });
