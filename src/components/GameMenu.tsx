@@ -44,6 +44,19 @@ export const GameMenu = defineComponent({
             </button>
           );
         }
+
+        if (props.onCancel) {
+          res.push(
+            <button
+              disabled={props.isCanCancel === false}
+              class="btn btn-outline btn-sm"
+              onClick={props.onCancel}
+            >
+              <i class="gg-mail-reply"></i>
+            </button>
+          );
+        }
+
         return res;
       };
 

@@ -1,7 +1,7 @@
 import { ref, toRaw, triggerRef } from "vue";
 import { debugCard, emojiCards, equal, firstCard, hasFirstCard } from "./Card";
 import { useGames } from "./Games";
-import { Card, Game, Player, Trick } from "./model";
+import { Card, Game, isWoodMan, Player, Trick } from "./model";
 import { detect, duel } from "./Referee";
 
 import { askTrick } from "./req";
@@ -181,14 +181,22 @@ const __useGame = (game: Game) => {
   const trashTricks = () => {
     game.championer = undefined;
     game.tricks = [];
+    game.autoStart = false;
     triggerRef(gameRef);
     updateGame(game);
   };
 
   const cancelTrick = () => {
-    getGameLastTricks(game)?.shift();
+    const nGame: Game = JSON.parse(JSON.stringify(gameRef.value));
+    const tricks = getGameLastTricks(nGame);
+    const res = tricks?.shift();
+    if (res?.player && isWoodMan(res.player)) {
+      tricks?.shift();
+    }
+    nGame.tricks = nGame.tricks.filter((t) => t.tricks.length > 0);
+    gameRef.value = nGame;
     triggerRef(gameRef);
-    updateGame(game);
+    updateGame(nGame);
   };
 
   const moveCursor = async () => {
@@ -220,7 +228,6 @@ const __useGame = (game: Game) => {
       }
       if (checkGameFinish(game, trick.player)) {
         game.championer = trick.player;
-        
       }
       gameRef.value = game;
       triggerRef(gameRef);
