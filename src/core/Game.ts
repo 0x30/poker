@@ -211,10 +211,16 @@ const __useGame = (game: Game) => {
     try {
       const t = check(game, trick);
       if (needHandleTrick === undefined) {
+        t.createTime = 0;
         game.tricks.push({ idx: game.tricks.length, tricks: [t] });
-      } else getGameLastTricks(game)?.push(trick);
+      } else {
+        const res = getGameLastTricks(game);
+        trick.createTime = (res?.length ?? 0) + 1;
+        res?.push(trick);
+      }
       if (checkGameFinish(game, trick.player)) {
         game.championer = trick.player;
+        
       }
       gameRef.value = game;
       triggerRef(gameRef);

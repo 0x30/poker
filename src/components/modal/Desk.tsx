@@ -200,7 +200,7 @@ const TrickList = defineComponent({
                 .map((cs) => (
                   <pre key={cs.createTime} data-prefix={cs.player.nikeName}>
                     <span class="float-right mr-3 text-base-300 opacity-40">
-                      {new Date(cs.createTime).toLocaleString()}
+                      {cs.createTime}
                     </span>
                     {cs.cards ? (
                       <CardGroup size={CardGroupSize.small} cards={cs.cards} />
