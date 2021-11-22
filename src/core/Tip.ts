@@ -155,7 +155,7 @@ export const tips = (cs: Card[], cardsPool: Card[]) => {
               cs[0].number > result.weight &&
               re(cards, cs[0].number, 2).length > 0
           )
-          .map((cs) => [...cs, ...getSmalls(cards, [cs[0].number], 2)]);
+          .map((cs) => [...cs, ...re(cards, cs[0].number, 2)[0]]);
       case CardsType.danshun:
         return danshunCards(cs.length, result.weight, cards);
       case CardsType.shuangshun:
@@ -167,7 +167,7 @@ export const tips = (cs: Card[], cardsPool: Card[]) => {
               cs[0].number > result.weight &&
               re(cards, cs[0].number, 2).length > 0
           )
-          .map((cs) => [...cs, ...getSmalls(cards, [cs[0].number], 2)]);
+          .map((cs) => [...cs, ...re(cards, cs[0].number, 2)[0]]);
       case CardsType.sidaiyi:
         return repeatCard(cards, 4)
           .filter((cs) => cs[0].number > result.weight)
