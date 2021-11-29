@@ -38,7 +38,7 @@ const EmojiCards = {
     12: "🂽",
     13: "🂾",
     14: "🂱",
-    15: "🂲",
+    16: "🂲",
     18: "大🃏",
   },
   [Color.Spade]: {
@@ -54,7 +54,7 @@ const EmojiCards = {
     12: "🂭",
     13: "🂮",
     14: "🂡",
-    15: "🂢",
+    16: "🂢",
     17: "小🃏",
   },
   [Color.Club]: {
@@ -70,7 +70,7 @@ const EmojiCards = {
     12: "🃝",
     13: "🃞",
     14: "🃑",
-    15: "🃒",
+    16: "🃒",
   },
   [Color.Diamond]: {
     3: "🃃",
@@ -85,7 +85,7 @@ const EmojiCards = {
     12: "🃍",
     13: "🃎",
     14: "🃁",
-    15: "🃂",
+    16: "🃂",
   },
 };
 
@@ -109,7 +109,7 @@ const numberMap = {
   12: "Q",
   13: "K",
   14: "A",
-  15: "2",
+  16: "2",
   17: "JOKER",
   18: "JOKER",
 };
@@ -134,7 +134,7 @@ const deNumberMap = {
   Q: 12,
   K: 13,
   A: 14,
-  "2": 15,
+  "2": 16,
   JOKER: 17,
 };
 
@@ -177,9 +177,13 @@ export const debugCards = (cards: any) => {
 
 // 一副牌
 export const deskCards = [
-  ...allColors.flatMap((c) =>
-    new Array(13).fill(1).map<Card>((v, idx) => ({ color: c, number: idx + 3 }))
-  ),
+  ...allColors
+    .flatMap((c) =>
+      new Array(13)
+        .fill(1)
+        .map<Card>((v, idx) => ({ color: c, number: idx + 3 }))
+    )
+    .map((r) => ({ color: r.color, number: r.number === 15 ? 16 : r.number })),
   ...jokers,
 ];
 
@@ -196,9 +200,9 @@ export const deskCards = [
  * 12 | Q
  * 13 | K
  * 14 | A
- * 15 | 2
- * 16 | foker
+ * 16 | 2
  * 17 | foker
+ * 18 | foker
  */
 
 export const equal = (card1: Card, card2: Card) =>

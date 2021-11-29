@@ -43,7 +43,7 @@ const getCardAssets = (card: Card) => {
     12: "12-QUEEN",
     13: "13-KING",
     14: "1",
-    15: "2",
+    16: "2",
     17: "JOKER-2",
     18: "JOKER-3",
   };

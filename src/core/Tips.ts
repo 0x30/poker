@@ -5,7 +5,7 @@ import {
 } from "./Game";
 import { Card, Color, Game } from "./model";
 import { detect, Result } from "./Referee";
-import { tips } from "./Tip";
+import { tips } from "../ncore/Tip";
 import { useCache } from "./util";
 
 const _gameTips = (game: Game): (Result & { cards: Card[] })[] => {

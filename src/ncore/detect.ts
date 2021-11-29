@@ -57,7 +57,7 @@ const detectTypeNumbers = (
       if (same4Res) return [CardsType.sidaiyi, same4Res];
     }
 
-    if (Math.max(...numbers) < 15 && monotone(numbers)) {
+    if (monotone(numbers)) {
       return [CardsType.danshun, Math.max(...numbers)];
     }
   }
